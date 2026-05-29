@@ -1,0 +1,79 @@
+$ julia
+               _
+   _       _ _(_)_     |  Documentation: https://docs.julialang.org
+  (_)     | (_) (_)    |
+   _ _   _| |_  __ _   |  Type "?" for help, "]?" for Pkg help.
+  | | | | | | |/ _` |  |
+  | | |_| | | | (_| |  |  Version 1.12.6 (2026-04-09)
+ _/ |\__'_|_|_|\__'_|  |  Official https://julialang.org release
+|__/                   |
+
+julia> include("./matmul.jl")
+Matrix sizes of A, B, C (respectively): 100x100, 100x100, 100x100  (all Float64)
+
+
+
+
+---------- Manual column-major matmul ----------
+BenchmarkTools.Trial: 10000 samples with 1 evaluation per sample.
+ Range (min … max):  143.709 μs … 244.416 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     143.959 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   144.100 μs ±   1.621 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+   ▃▇▇▇█▆▅▁                                                     ▂
+  ███████████▆▆▇▅▅▆▃▆▄▃▅▄▄▄▃▄▃▁▃▃▄▃▃▃▁▃▄▃▆▅▆█▇▇█▇▆▄▅▆▅▁▅▃▄▃▃▃▃▃ █
+  144 μs        Histogram: log(frequency) by time        147 μs <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+
+
+
+---------- Manual row-major matmul ----------
+BenchmarkTools.Trial: 10000 samples with 1 evaluation per sample.
+ Range (min … max):  400.750 μs … 563.291 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     402.375 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   403.924 μs ±   7.946 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  ▄▆█▇▂▂▃▂                                                      ▁
+  ████████▆▆▆▇▆▅▅▆▅▅▅▅▃▅▅▆▇▇▆▆▆▆▆▅▅▅▆▅▄▅▃▄▄▅▅▅▅▅▇▆▆▅▆▅▅▄▅▅▄▅▃▅▅ █
+  401 μs        Histogram: log(frequency) by time        436 μs <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+
+
+
+---------- Native mul! ----------
+BenchmarkTools.Trial: 10000 samples with 1 evaluation per sample.
+ Range (min … max):  20.958 μs … 228.500 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     21.417 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   22.739 μs ±   4.091 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  ▄▇█▆▃▂▁                         ▁▂▁     ▁▁▂▂▂▁▁▁▁▁ ▁ ▁▁ ▁    ▂
+  ████████▇▆▇▇█▆▇▅▅▅▃▄▄▁▃▃▁▄▃▃▅▅▆█████▇▅▆▇██████████████████▇▇ █
+  21 μs         Histogram: log(frequency) by time      32.4 μs <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+
+
+
+---------- Native * ----------
+BenchmarkTools.Trial: 10000 samples with 1 evaluation per sample.
+ Range (min … max):  21.208 μs … 142.416 μs  ┊ GC (min … max): 0.00% … 66.59%
+ Time  (median):     22.042 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   23.193 μs ±   9.772 μs  ┊ GC (mean ± σ):  3.49% ±  6.86%
+
+    ▃▃▆▄▅█▆
+  ▃▇███████▇▃▂▂▂▁▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▃▂▂▂▂▂▂▂▂▂▂▂▂ ▃
+  21.2 μs         Histogram: frequency by time         29.3 μs <
+
+ Memory estimate: 80.08 KiB, allocs estimate: 3.
+
+
+
+Median times and ratio wrt native * one:
+     native mul! |     0.000021 |     0.971645
+        native * |     0.000022 |     1.000000
+    column-major |     0.000144 |     6.531122
+       row-major |     0.000402 |    18.254922
+
+julia>

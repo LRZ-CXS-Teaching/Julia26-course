@@ -1,0 +1,90 @@
+# <https://www.nano-editor.org/dist/latest/nano.html>
+# ERE = Extended Regular Expression
+#
+# NOTE: coloring commands are applied in the order in which they are specified => later commands can recolor stuff that was colored earlier
+#
+# color [bold,][italic,]fgcolor,bgcolor "regex" ...           : display all pieces of text that match the ERE "regex" with foreground/background color "fgcolor"/"bgcolor"
+#   - at least one color must be specified
+#   - valid colors for foreground and background are:
+#       white, black, red, blue, green, yellow, magenta, and cyan
+#   - you may use the prefix "bright" to get a stronger color highlight for the foreground
+#   - if your terminal supports transparency, not specifying a "bgcolor" tells nano to attempt to use a transparent background
+#   - the color pair may be preceded by bold and/or italic (separated by commas) to get a bold and/or slanting typeface, if your terminal can do those
+#   - on 256-color terminal emulators, other valid (but unprefixable) color names are:
+#       pink, purple, mauve, lagoon, mint, lime, peach, orange, latte, rosy, beet, plum, sea, sky, slate, teal, sage, brown, ocher, sand, tawny, brick, crimson, and normal
+#   - on 256-color terminal emulators, the color may also be specified as a three-digit hexadecimal number prefixed with #,
+#       with the digits representing the amounts of red, green, and blue
+#
+# icolor fgcolor,bgcolor "regex" ...          : same as above, except that the text matching is case insensitive
+#
+# color fgcolor,bgcolor start="sr" end="er"   : display all pieces of text whose start matches ERE "sr" and whose end matches ERE "er" with foreground/background color "fgcolor"/"bgcolor"
+#
+# icolor fgcolor,bgcolor start="sr" end="er"  : same as above, except that the text matching is case insensite
+
+# Julia syntax highlighting rules for Nano
+
+syntax "julia" "\.jl$"
+header "^#!.*/(env +)?julia[-0-9._]*( |$)"
+magic "Julia"
+comment "#"
+
+## built-in keywords (<https://docs.julialang.org/en/v1/base/base/#Keywords>)
+color red "\<(baremodule|begin|break|catch|const|continue|do|else|elseif|end|export)\>"
+color red "\<(false|finally|for|function|global|if|import|let|local|macro|module)\>"
+color red "\<(quote|return|struct|true|try|using|while)\>"
+color red "\<(where|in|isa|public|outer|as)\>"
+color red "\<(abstract[[:space:]]+type|mutable[[:space:]]+struct|primitive[[:space:]]+type)\>"
+color red "\<(true|false|nothing)\>"
+
+## operators
+#color red "[.:;,+*|=!\%?]" "<" ">" "/" "-" "&"
+color red "[.:;,+*|=!\%?/<>&-]"
+color red "[÷⋅×√∛⊻∈∉∋∌≈≉≠≡≢≤≥∩∪⊆⊇⊈⊉⊊⊋±∘']"
+
+## functions
+color brightcyan "[A-Za-z][A-Za-z0-9_]*\!?\.?[\(]"
+#color brightblue "\<[A-Za-z_][A-Za-z0-9_]*\>[[:space:]]*\("
+
+## symbols
+#color white "([^A-Za-z0-9_:]|^):[0-9A-Za-z_]+"
+color white "([^A-Za-z0-9_:]|^):[A-Za-z_][A-Za-z0-9_]*"
+
+## parentheses
+color magenta "[(){}]" "\[" "\]"
+
+## string interpolation
+#color green "\$\([^)]*\)"
+color green "\$\([^)]+\)" "\$[A-Za-z_][A-Za-z0-9_]*"
+
+## external commands
+color red start="`" end="`"
+
+## macros
+color brightyellow "@[A-Za-z0-9_]+"
+
+## numbers
+color cyan "\<[0-9]([0-9_]*[0-9])?\.[0-9_]*([eE][+-]?[0-9_]+|f[0-9]+)?\>"
+color cyan "\<[0-9_]*\.[0-9]([0-9_]*[0-9])?([eE][+-]?[0-9_]+|f[0-9]+)?\>"
+color cyan "\<[0-9]([0-9_]*[0-9])?([eE][+-]?[0-9_]+|f[0-9]+)\>"
+color cyan "\<[0-9][0-9_]*\>"
+
+## chars and strings
+color yellow start="[rb]?["]" end="["]" start="[rb]?["]{3}" end="["]{3}"
+color yellow "[']\\?[^' ][']"
+#color yellow "\"(\\.|[^\"])*\"" "'(\\.|[^'])*'"
+#color yellow start="\"\"\"" end="\"\"\""
+#color yellow start="'''" end="'''"
+
+## comments
+color lightblack "^#.*$" "[[:space:]]#.*$"
+color lightblack start="#=" end="=#"
+
+## trailing spaces
+color ,green "[[:space:]]+$"
+
+## reminders
+color brightwhite,yellow "\<(FIXME|FIX-ME|TODO|XXX)\>"
+
+
+
+

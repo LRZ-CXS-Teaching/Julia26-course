@@ -1,0 +1,42 @@
+## Automatically indent a newly created line to the same number of
+## tabs and/or spaces as the preceding line -- or as the next line
+## if the preceding line is the beginning of a paragraph.
+set autoindent
+
+## Remember the used search/replace strings for the next session.
+set historylog
+
+## Display line numbers to the left (and any anchors in the margin).
+set linenumbers
+
+## Switch on multiple file buffers (inserting a file will put it into
+## a separate buffer).
+set multibuffer
+
+## Remember the cursor position in each file for the next editing session.
+set positionlog
+
+## Spread overlong lines over multiple screen lines.
+set softwrap
+
+## Use this tab size instead of the default; it must be greater than 0.
+set tabsize 4
+
+## Convert each typed tab to the fitting number of spaces.
+set tabstospaces
+
+## Paint the interface elements of nano.  These are examples; there are
+## no colors by default, except for errorcolor and spotlightcolor.
+set titlecolor bold,white,blue
+set promptcolor lightwhite,lightblack
+set statuscolor bold,white,green
+set errorcolor bold,white,red
+set numbercolor cyan,lightblack
+set keycolor cyan
+set functioncolor green
+
+## === Syntax coloring ===
+## For all details, see 'man nanorc', section SYNTAX HIGHLIGHTING.
+
+## To include most of the existing syntax definitions, you can do:
+include "/usr/share/nano/*.nanorc"
