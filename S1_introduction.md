@@ -5,16 +5,15 @@
 <details>
   <summary>Show Table of Content</summary>
 
-- [Julia 2026 course — Session 1: introduction](#julia-2026-course--session-1-introduction)
-  - [1. `juliaup` and Julia installation](#1-juliaup-and-julia-installation)
-  - [2. REPL basics](#2-repl-basics)
-  - [3. Julia syntax essentials](#3-julia-syntax-essentials)
-  - [4. Julia cool stuff](#4-julia-cool-stuff)
-  - [5. A package worth mentioning: InteractiveUtils](#5-a-package-worth-mentioning-interactiveutils)
-  - [6. BenchmarkTools intro (hands-on setup) (5 min)](#6-benchmarktools-intro-hands-on-setup-5-min)
-    - [Example: benchmark native sum function vs manual implementation](#example-benchmark-native-sum-function-vs-manual-implementation)
-    - [Example: benchmark sorting vector, save result to file and load it back](#example-benchmark-sorting-vector-save-result-to-file-and-load-it-back)
-  - [Hands-on](#hands-on)
+- [1. `juliaup` and Julia installation](#1-juliaup-and-julia-installation)
+- [2. REPL basics](#2-repl-basics)
+- [3. Julia syntax essentials](#3-julia-syntax-essentials)
+- [4. Julia cool stuff](#4-julia-cool-stuff)
+- [5. A package worth mentioning: InteractiveUtils](#5-a-package-worth-mentioning-interactiveutils)
+- [6. BenchmarkTools intro (hands-on setup) (5 min)](#6-benchmarktools-intro-hands-on-setup-5-min)
+  - [Example: benchmark native sum function vs manual implementation](#example-benchmark-native-sum-function-vs-manual-implementation)
+  - [Example: benchmark sorting vector, save result to file and load it back](#example-benchmark-sorting-vector-save-result-to-file-and-load-it-back)
+- [Hands-on](#hands-on)
 </details>
 
 
