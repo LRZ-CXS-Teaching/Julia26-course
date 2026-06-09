@@ -27,9 +27,15 @@ In short: If a serial program requires a time $T_1$ to complete, where a fractio
 ```math
 T_N = (1-p)T_1 + p\frac{T_1}{N} = \left(1 - \left(1-\frac{1}{N}\right)p\right) T_1 \le T_1\;.
 ```
-
-
-(Amdahl's law, ... ??)
+We can re-express that in terms of speed-up: $S = T_1 / T_N$ (How much faster is the parallel execution with $N$ workers with respect to the serial execution?).
+```math
+S_N = \frac{1}{(1-p)+p/N}\;,
+```
+or, as a parallel efficiency $\varepsilon_N$ (in comparison to ideal scaling) by
+```math
+\varepsilon_N = \frac{T_1/N}{T_N}=\frac{1}{N(1-p)+p}\;.
+```
+That's called [*Amdahl's Law*](https://en.wikipedia.org/wiki/Amdahl%27s_law). The essence is that with this simple model, we can make simple assessments about possible speed-up gains from simple scaling experiments - even if this model does not incorporate things like IO or communication (or, generally, parallelization) overhead. It is always a good idea to have such a model in mind to gauge expectations about the code to be parallelized (also important to judge about performance issues).
 
 
 ## Parallel Programming Models in Julia
