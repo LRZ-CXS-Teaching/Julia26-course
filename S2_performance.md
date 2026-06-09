@@ -18,7 +18,7 @@ Julia is a strongly typed and natively to the hardware compiled language as is e
 > * Julia doesn't guarantee you performance!
 > * But a good control over performance.
 
-`@time` and [BenchmarkTools](https://juliaci.github.io/BenchmarkTools.jl/stable/) habe already been mentioned. [Profile](https://docs.julialang.org/en/v1/manual/profile/) and [ProfileView](https://github.com/timholy/ProfileView.jl) can further help in complex software projects.
+`@time` and [BenchmarkTools](https://juliaci.github.io/BenchmarkTools.jl/stable/) have already been mentioned. [Profile](https://docs.julialang.org/en/v1/manual/profile/) and [ProfileView](https://github.com/timholy/ProfileView.jl) can further help in complex software projects.
 
 However,
 
