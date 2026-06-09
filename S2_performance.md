@@ -13,9 +13,10 @@
 
 ## General Considerations
 ### Overview
-> [!TIP]
-> **RULE**
-> * Optimize ONLY when and where it's necessary!
+> [!WARNING]
+> **Rules for Optimization**
+> * Measure and analyze performance before optimizing!
+> * Optimize ONLY performance critical sections of code! (20/80 rule)
 
 ## Special Patterns
 
