@@ -23,7 +23,7 @@ If two threads/processes run on the same CPU, the OS gives them a time slot wher
 It is hopefully immediately clear that concurrency in that sense actually means sharing of resources, which is already due to the context switching very inefficient. And thus, that's not desirable for HPC. One should be carefully check the placement of processes and threads, therefore. It has a really strong performance impact.
 
 ### Scaling Laws and Limits of Parallelism
-In short: If a serial program requires a time $T_1$ to complete, where a fraction, $0\lesseq p\lesseq1$, of that work can be parallized, and if we have $N$ workers then, to which we distribute the workload, the total runtime of the parallel program should be shorter by
+In short: If a serial program requires a time $T_1$ to complete, where a fraction, $0\le p\le1$, of that work can be parallized, and if we have $N$ workers then, to which we distribute the workload, the total runtime of the parallel program should be shorter by
 ```math
 T_N = (1-p)T_1 + p\frac{T_1}{N}
 ```
