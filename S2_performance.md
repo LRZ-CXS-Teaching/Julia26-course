@@ -49,6 +49,45 @@ Macros and Metaprogramming in Julia](https://www.youtube.com/watch?v=LPkB2GYoOZI
 ## Special Patterns
 
 ### Constant Global Pattern (type stability)
+Let's look at a simple scenario. We define a global variable, and two functions using it.
+```julia
+julia> var = 10
+10
+
+julia> f(x) = var + x
+f (generic function with 1 method)
+
+julia> g(x, y) = x + y
+g (generic function with 1 method)
+```
+Let's now benchmark both functions.
+```julia
+julia> using BenchmarkTools
+
+julia> @btime f(5);
+  19.113 ns (0 allocations: 0 bytes)
+
+julia> @btime g(5,$var);                    # remember: variable interpolation in macros
+  2.154 ns (0 allocations: 0 bytes)
+
+julia> @btime g(5,10);
+  1.202 ns (0 allocations: 0 bytes)
+```
+As reference, we also executed `g` with just the numbers, 5 and 10. So. What happened here? Let's have a look on the code using `@code_warntype`.
+```julia
+julia> @code_warntype f(5)
+MethodInstance for f(::Int64)
+  from f(x) @ Main REPL[3]:1
+Arguments
+  #self#::Core.Const(Main.f)
+  x::Int64
+Body::Any
+1 ─ %1 = Main.:+::Core.Const(+)
+│   %2 = Main.var::Any
+│   %3 = (%1)(%2, x)::Any
+└──      return %3
+```
+
 
 ### Struct of Arrays Pattern
 
