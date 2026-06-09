@@ -144,7 +144,7 @@ In many cases, with this little information extra, compilers really can do some 
 
 
 ## Hands-on
-Don't be confused. The hands-on may not be related to Performance directly, but also to see Julia programming styles and patterns in real-life applications.
+Don't be confused. The hands-on may not be related to "performance" directly, but also to show Julia programming styles and patterns in real-life applications.
 
 * Containers and Algorithms (data handling patterns)
 * Plotting and Curve Fitting (Mandelbrot-/Julia-sets; 3 schemes to fit curves to data)
