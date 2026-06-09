@@ -1,6 +1,8 @@
 # Parallelism-related Topics and Patterns
 
-## Overview - Types of Parallelism
+## Overview 
+
+### Types of Parallelism in a Computer
 
 There are many different possibilities to parallelize workflows on classical CPUs. 
 
@@ -20,7 +22,9 @@ If two threads/processes run on the same CPU, the OS gives them a time slot wher
 
 It is hopefully immediately clear that concurrency in that sense actually means sharing of resources, which is already due to the context switching very inefficient. And thus, that's not desirable for HPC. One should be carefully check the placement of processes and threads, therefore. It has a really strong performance impact.
 
-<br>
+### Scaling Laws and Limits of Parallelism
+(Amdahl's law, ... ??)
+
 
 ## Parallel Programming Models in Julia
 
