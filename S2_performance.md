@@ -7,7 +7,6 @@
 > * Measure and analyze performance before optimizing!
 > * Optimize ONLY performance critical sections of code! ([20/80 rule](https://en.wikipedia.org/wiki/Pareto_principle))
 > * First: CORRECT!!!   Second: Efficient! (TDD)
-> * Adhere to efficient programming patterns! Understand your code! (Refactor often!)
 
 Modern hardware is really complex (both CPUs and GPUs). Compilers and hardware use already quite some heuristics to analyze flow and memory access patterns in order to optimally perform on the hardware, and to support programmers. However, neither of them can work magic, either. And both are obliged to keep the `correct` semantics, primarily.
 
@@ -25,6 +24,20 @@ However,
 > [!TIP]
 > **How to write efficient Code**
 > * The less code you write, not only the less the chance for bugs, but also the higher the chance for performance!
+
+And,
+
+> [!TIP]
+> **Programming is Communication**
+> * Remember that code is written mostly to be read - by oneself, or by others. (20/80 rule, again)
+> * Adhere to efficient programming patterns! Know and understand your code! (Refactor often!)
+
+(For a negative representation: [`How to write unmaintainable Code`](https://github.com/Droogans/unmaintainable-code))
+
+> [!WARNING]
+> **Keep Maintainability!**
+> * Badly maintained code is very often (if not always) also badly performing.
+
 
 Julia provides already a feature-rich syntax and a large and versatile package eco-system which makes lot of even complex programming tasks very comprehensible. Search for them! Use them!
 It's not a shame to use Google (or, even Google AI) for that.
