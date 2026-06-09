@@ -2,4 +2,4 @@
 
 * VIM supports natively Julia syntax highlighting
 * useful key codes:
-  * Ctrl + k * X -> U+00D7
+  * Ctrl + k * X &rarr; \U+00D7
