@@ -25,7 +25,7 @@ It is hopefully immediately clear that concurrency in that sense actually means 
 ### Scaling Laws and Limits of Parallelism
 In short: If a serial program requires a time $T_1$ to complete, where a fraction, $0\le p\le1$, of that work can be parallized, and if we have $N$ workers then, to which we distribute the workload, the total runtime of the parallel program should be shorter by
 ```math
-T_N = (1-p)T_1 + p\frac{T_1}{N}
+T_N = (1-p)T_1 + p\frac{T_1}{N} = \left(1 - \left(1-\frac{1}{N}\right)p\right) T_1 \le T_1\;.
 ```
 
 
