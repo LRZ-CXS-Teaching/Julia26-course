@@ -50,6 +50,20 @@ Macros and Metaprogramming in Julia](https://www.youtube.com/watch?v=LPkB2GYoOZI
 
 ### Constant Global Pattern (type stability)
 
+### Struct of Arrays Pattern
+
+### Memoization Pattern (idea)
+
+### Barrier Function Pattern (type-unstable functions) ?
+
 
 
 ## Hands-on
+Don't be confused. The hands-on may not be related to Performance directly, but also to see Julia programming styles and patterns in real-life applications.
+
+* Containers and Algorithms (data handling patterns)
+* Plotting and Curve Fitting (Mandelbrot-/Julia-sets; 3 schemes to fit curves to data)
+* Operator Overloading (Julia's way to easy life - syntactic sugar)
+
+
+
