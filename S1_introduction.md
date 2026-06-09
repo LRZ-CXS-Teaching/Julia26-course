@@ -659,7 +659,7 @@ Then, run the benchmarking with:
 julia> include("./matmul_hands-on.jl")
 ```
 
-**QUESTION 1**: what does the benchmarking tell us about how Julia stores matrixes?
+**QUESTION 1**: What does the benchmarking tell us about how Julia stores matrixes?
 
-**QUESTION 2**: there are 2 native methods benchmarked; do they perform the same? (spoiler: no) why?
+**QUESTION 2**: There are 2 native methods benchmarked; do they perform the same? (spoiler: no) why?
 
