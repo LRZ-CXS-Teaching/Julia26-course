@@ -2,4 +2,7 @@
 
 * VIM supports natively Julia syntax highlighting
 * useful key codes:
-  * Ctrl + k * X &rarr; \U+00D7
+  * Ctrl+k * X &rarr; ×
+  * Ctrl+k R T &rarr; √
+  * Greek Letters: Ctrl+k * \<letter\> &rarr; \<greek letter\>
+    for instance: Ctrl+k * a &rarr; α  ,    Ctrl+k * G &rarr; Γ
