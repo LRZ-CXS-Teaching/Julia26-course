@@ -1,5 +1,10 @@
 # Julia 2026 course — Session 1: introduction
 
+## Table of Content
+
+<details>
+  <summary>Show Table of Content</summary>
+
 - [Julia 2026 course — Session 1: introduction](#julia-2026-course--session-1-introduction)
   - [1. `juliaup` and Julia installation](#1-juliaup-and-julia-installation)
   - [2. REPL basics](#2-repl-basics)
@@ -10,12 +15,7 @@
     - [Example: benchmark native sum function vs manual implementation](#example-benchmark-native-sum-function-vs-manual-implementation)
     - [Example: benchmark sorting vector, save result to file and load it back](#example-benchmark-sorting-vector-save-result-to-file-and-load-it-back)
   - [Hands-on](#hands-on)
-
-<br>
-<br>
-
-
-
+</details>
 
 
 ## 1. `juliaup` and Julia installation
