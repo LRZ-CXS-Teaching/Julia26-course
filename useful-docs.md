@@ -35,8 +35,9 @@ Julia 101:
 
 Books, videos and other resources:
 
-* [**Book "Julia High Performance"**](https://juliahighperformance.com/)
-* [Book "Think Julia"](https://virtualmmx.ddns.net/gbooks/ThinkJulia.pdf)
+* [**Book: "Julia High Performance"**](https://juliahighperformance.com/)
+* [**Book: Hands-On Design Patterns and Best Practices with Julia - Proven solutions to common problems in software design for Julia 1.x**](https://github.com/PacktPublishing/Hands-on-Design-Patterns-and-Best-Practices-with-Julia) : good general introduction to julia and design patterns (from a more general software design principles point of view)
+* [**Book "Think Julia"**](https://virtualmmx.ddns.net/gbooks/ThinkJulia.pdf) : general intro to data science with Julia
 * [**"Vendor Neutral GPU Programming in Julia"**](https://youtu.be/QvlBmh1t9I4?si=VppT6jr00dreLWWc)
 * [**"Rust, Julia, and Go: Disruptive New Programming Languages Changing the Face of Computing"**](https://youtu.be/6qCH7Y2rc_w?si=XVe7Gkmwqo8W1xJR)
 * [<https://www.youtube.com/watch?v=gnxz9Fs0_Pw>]
