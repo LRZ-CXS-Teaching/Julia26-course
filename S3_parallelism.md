@@ -22,6 +22,8 @@ It is hopefully immediately clear that concurrency in that sense actually means 
 
 <br>
 
+## Parallel Programming Models in Julia
+
 We will look at the following programming models for parallelism, how they can be employed in Julia.
 
 - simd / vectorization
@@ -29,9 +31,9 @@ We will look at the following programming models for parallelism, how they can b
 - parallel workers and task-parallelism
 - message passing
 
-## SIMD (Vectorization)
+### SIMD (Vectorization)
 
-## Threads
+### Threads
 `JULIA_EXCLUSIVE=1 julia --threads 4 prog.jl`
 
 TMP (TODO): 
@@ -39,9 +41,9 @@ using ThreadPinning
 pinthreads(:cores)
 threadinfo()
 
-## Task-Parallelism (distributed, pmap)
+### Task-Parallelism (distributed, pmap)
 
-## MPI (Message Passing Interface)
+### MPI (Message Passing Interface)
 
 
 ## Hands-on
