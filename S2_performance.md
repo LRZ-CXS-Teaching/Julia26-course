@@ -4,8 +4,8 @@
 <details>
 <summary>Inhalt anzeigen</summary>
   
-  [General Considerations](#general-considerations)
-  [Special Patterns](#special-patterns)
+  [General Considerations](#general-considerations) <br>
+  [Special Patterns](#special-patterns) <br>
   [Hands-on](#hands-on)
 </details>
 
