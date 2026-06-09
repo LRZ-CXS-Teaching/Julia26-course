@@ -132,7 +132,7 @@ Body::Int64
 ```
 
 In C++, this is called *const-correctnes*. It's probably a good idea to adhere to it. Judging code becomes not only easier for a compiler then, but also for other programmers reading this code.
-In many cases, with this little information extra, compilers really can do some sort of magic in terms of code reduction during compilation - the maximum of performance optimization ("The fastest code is that one which doesn't need to execute at all.").
+In many cases, with this little information extra, compilers really can do some sort of magic in terms of code reduction during compilation - the maximum of performance optimization: "The fastest code is that one which doesn't need to execute at all." (the compiler can calculate things, too, and replaces the result immediately in the code, for instance).
 
 
 ### Struct of Arrays Pattern
