@@ -87,6 +87,52 @@ Body::Any
 │   %3 = (%1)(%2, x)::Any
 └──      return %3
 ```
+In the REPL, the color code is different. It is here just the syntax-highlighting that removed the color. The essential thing to note here, however, is that `Main.var::Any`. That is the type of `var` is inferred as `Any`. Why is that so? Clearly,
+```julia
+julia> typeof(var)
+Int64
+```
+It's an `Int64`! What's gone wrong then?
+
+Simple answer: The REPL compiles the functions just after pressing enter, and uses these function then later. `f` incorporates the global variable `var`, which is then evaluated somewhen later. But then, at that moment, `var` might have been changed in between! It could have even a different type now! (To be honest, `var` is only a name, and points just to objects of some type ...)
+And the compiler must respect that this type might have changed (that's part of the philosophy of Julia to write as generical code as possible). So, it decides `var` inside `f` to of type `Any`, which is then converted to the type that it has in fact during runtime. This conversion costs time!
+
+Differently from e.g. C/C++ where a variable name is solidly assigned to a type, Julia allows more flexibility. But that comes at a price, obviously.
+
+<br>
+
+What can we do about it?
+
+* Defining `f` via `f(x) = x + var::Int64` works. But this now makes the implicit contract that `var` is an `Int64`. If we changed `var = 10.0` to be a `Float64`, this function would be broken.
+* `g(x,y)` showed already a way. Defining functions with an explicit argument list, and calling this function with the global variable makes it running only with local variables. The compiler compiles for each type of `var` another function. And infers there the current type. *type stability* does the rest.
+* There is another solution. And from point of communication maybe even the best one. The major problem was that `var` is a *variable*, and could change anytime. The justified question is: "Is this really meant o be so?". More often than not, such *variables* are in fact *constants* - semantically. If that's the case, we should say so:
+```julia
+julia> const var = 10
+10
+
+julia> f(x) = var + x
+f (generic function with 1 method)
+
+julia> using BenchmarkTools
+
+julia> @btime f(5);
+  1.202 ns (0 allocations: 0 bytes)
+
+julia> @code_warntype f(5)
+MethodInstance for f(::Int64)
+  from f(x) @ Main REPL[1]:1
+Arguments
+  #self#::Core.Const(Main.f)
+  x::Int64
+Body::Int64
+1 ─ %1 = Main.:+::Core.Const(+)
+│   %2 = Main.var::Core.Const(10)
+│   %3 = (%1)(%2, x)::Int64
+└──      return %3
+```
+
+In C++, this is called *const-correctnes*. It's probably a good idea to adhere to it. Judging code becomes not only easier for a compiler then, but also for other programmers reading this code.
+In many cases, with this little information extra, compilers really can do some sort of magic in terms of code reduction during compilation - the maximum of performance optimization ("The fastest code is that one which doesn't need to execute at all.").
 
 
 ### Struct of Arrays Pattern
