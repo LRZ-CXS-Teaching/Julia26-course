@@ -87,15 +87,15 @@ Body::Any
 │   %3 = (%1)(%2, x)::Any
 └──      return %3
 ```
-In the REPL, the color code is different. It is here just the syntax-highlighting that removed the color. The essential thing to note here, however, is that `Main.var::Any`. That is the type of `var` is inferred as `Any`. Why is that so? Clearly,
+In the REPL, the color code is different. It is here just the syntax-highlighting that removed the color. The essential thing to note here, however, is that `Main.var::Any`. That is, the type of `var` is inferred as `Any`. Why is that so? Clearly,
 ```julia
 julia> typeof(var)
 Int64
 ```
 It's an `Int64`! What's gone wrong then?
 
-Simple answer: The REPL compiles the functions just after pressing enter, and uses these function then later. `f` incorporates the global variable `var`, which is then evaluated somewhen later. But then, at that moment, `var` might have been changed in between! It could have even a different type now! (To be honest, `var` is only a name, and points just to objects of some type ...)
-And the compiler must respect that this type might have changed (that's part of the philosophy of Julia to write as generical code as possible). So, it decides `var` inside `f` to of type `Any`, which is then converted to the type that it has in fact during runtime. This conversion costs time!
+Simple answer: Julia compiles the functions just after pressing enter, and uses these functions then later. `f` incorporates the global variable `var`, which is then evaluated somewhen later, too. But then, at that future moment, `var` might have changed in between! It could even have a different type then! (To be honest, `var` is only a name, and points just to objects of some type at a time ...)
+And the compiler must respect that this type might have changed (that's part of the philosophy of Julia to write as generic code as possible). So, it decides `var` inside `f` to of type `Any`. And only during runtime, it's converted to the type that it does have in fact then. This runtime conversion costs time!
 
 Differently from e.g. C/C++ where a variable name is solidly assigned to a type, Julia allows more flexibility. But that comes at a price, obviously.
 
