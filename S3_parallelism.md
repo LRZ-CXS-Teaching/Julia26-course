@@ -34,7 +34,13 @@ We will look at the following programming models for parallelism, how they can b
 ## Threads
 `JULIA_EXCLUSIVE=1 julia --threads 4 prog.jl`
 
+TMP (TODO): 
+using ThreadPinning
+pinthreads(:cores)
+threadinfo()
+
 ## Task-Parallelism (distributed, pmap)
 
 ## MPI (Message Passing Interface)
+
 
