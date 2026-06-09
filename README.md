@@ -20,7 +20,7 @@ Topics covered include:
 
 Files in this repo:
 
-* `[useful-docs.md](useful-docs.md)` : collections of interesting resources (docs, books, youtube videos, etc)
+* [useful-docs.md](useful-docs.md) : collections of interesting resources (docs, books, youtube videos, etc)
 * `S1_introduction.md` : first session
 * `hands-on` and `hands-on_solutions` (self-explanatory)
 * `miscellanea`
