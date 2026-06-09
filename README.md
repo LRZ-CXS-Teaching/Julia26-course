@@ -24,7 +24,7 @@ Files in this repo:
 * [`S1_introduction.md`](S1_introduction.md) : first session
 * [`hands-on`](hands-on/) and [`hands-on_solutions`](hands-on_solutions) : hands-on exercises and possible solutions
 * [`miscellanea`](miscellanea)
-  * `nanorc` and `julia.nanorc` for Julia syntax highlight in the nano editor
+  * [`nanorc`](miscellanea/nanorc) and [`julia.nanorc`](miscellanea/julia.nanorc) for Julia syntax highlight in the nano editor
 
 <br>
 
