@@ -1,6 +1,6 @@
 # Julia 2026 course: useful docs
 
-Top interesting resources:
+## Top interesting resources:
 
 1. Cheatsheet: <https://cheatsheet.juliadocs.org/>
 2. Julia benchmarked against other languages
@@ -12,7 +12,7 @@ Top interesting resources:
 
 <br>
 
-Important Docs:
+## Important Docs:
 
 * [**Performance tips**](https://docs.julialang.org/en/v1/manual/performance-tips)
 * [**Types**](https://docs.julialang.org/en/v1/manual/types)
@@ -21,8 +21,7 @@ Important Docs:
 
 <br>
 
-
-Julia 101:
+## Julia 101:
 
 * [**JuliaBox Tutorials**](https://github.com/JuliaAcademy/JuliaTutorials)
 * [**A Gentle Introduction to Julia**](https://www.youtube.com/watch?v=4igzy3bGVkQ)
@@ -32,8 +31,7 @@ Julia 101:
 
 <br>
 
-
-Books, videos and other resources:
+## Books, Videos and other Resources:
 
 * [**Book: "Julia High Performance"**](https://juliahighperformance.com/), *A. Sengupta* : focus on performance, benchmarking, and parallelism
 * [**Book: "Hands-On Design Patterns and Best Practices with Julia"**](https://github.com/PacktPublishing/Hands-on-Design-Patterns-and-Best-Practices-with-Julia), *T. Kwong* : good general introduction to julia and design patterns (from a more general software design principles point of view)
