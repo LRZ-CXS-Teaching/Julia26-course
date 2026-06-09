@@ -25,6 +25,7 @@ Files in this repo:
 * [`hands-on/`](hands-on/) and [`hands-on_solutions/`](hands-on_solutions) : hands-on exercises and possible solutions
 * [`miscellanea/`](miscellanea)
   * [`nanorc`](miscellanea/nanorc) and [`julia.nanorc`](miscellanea/julia.nanorc) for Julia syntax highlight in the nano editor
+  * [`vim.md`](miscellanea/vim.md) Julia-related VIM stuff
 
 <br>
 
