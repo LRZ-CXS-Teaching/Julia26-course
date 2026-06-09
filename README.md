@@ -23,8 +23,8 @@ Files in this repo:
 * [`useful-docs.md`](useful-docs.md) : collections of interesting resources (docs, books, youtube videos, etc)
 * Lecture Notes:
   * [`Session 1: Introduction`](S1_introduction.md) : Julia Language Introduction
-  * [`Session 2:_Performance`](S2_performance.md) : Performance-related Topics and Patterns
-  * [`Session 3:_Parallelism`](S3_parallelism.md) : Parallelism-related Topics and Patterns
+  * [`Session 2: Performance`](S2_performance.md) : Performance-related Topics and Patterns
+  * [`Session 3: Parallelism`](S3_parallelism.md) : Parallelism-related Topics and Patterns
   * [`Session 4: GPUs`](S4_gpu_programming.md) : GPU-related Topics
 * [`hands-on/`](hands-on/) and [`hands-on_solutions/`](hands-on_solutions) : hands-on exercises and possible solutions
 * [`miscellanea/`](miscellanea)
