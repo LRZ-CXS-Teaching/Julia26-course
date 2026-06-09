@@ -13,7 +13,8 @@
 
 ## General Considerations
 ### Overview
-> [!RULE]
+> [!TIP]
+> **RULE**
 > * Optimize ONLY when and where it's necessary!
 
 ## Special Patterns
