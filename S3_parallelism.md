@@ -35,7 +35,7 @@ or, as a parallel efficiency $\varepsilon_N$ (in comparison to ideal scaling) by
 ```math
 \varepsilon_N = \frac{T_1/N}{T_N}=\frac{1}{N(1-p)+p}\;.
 ```
-That's called [*Amdahl's Law*](https://en.wikipedia.org/wiki/Amdahl%27s_law). The essence is that with this simple model, we can make simple assessments about possible speed-up gains from simple scaling experiments - even if this model does not incorporate things like IO or communication (or, generally, parallelization) overhead. It is always a good idea to have such a model in mind to gauge expectations about the code to be parallelized (also important to judge about performance issues).
+That's called [*Amdahl's Law*](https://en.wikipedia.org/wiki/Amdahl%27s_law). The essence is that with this simple model, we can make simple assessments about possible speed-up gains from simple scaling experiments - even if this model does not incorporate things like IO or communication (or, generally, parallelization) overhead. It is usually a good idea to have such a model in mind to gauge expectations about the code to be parallelized, to judge about performance issues, and to plan parallel HPC jobs (runtime estimation, CPU/GPU budget planning, etc.).
 
 
 ## Parallel Programming Models in Julia
