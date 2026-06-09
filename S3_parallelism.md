@@ -44,3 +44,7 @@ threadinfo()
 ## MPI (Message Passing Interface)
 
 
+## Hands-on
+
+- Ray-Tracing / Path-Tracing (Visualization)
+- PDE Solution (?)
