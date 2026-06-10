@@ -239,8 +239,9 @@ julia> x = A\b
 and the `BenchmarkTools`.
 
 
-### Task-Parallelism (distributed, pmap)
-
+### Task-Parallelism (Distributed, pmap)
+TODO:
+[Multi-processing and Distributed Computing](https://docs.julialang.org/en/v1/manual/distributed-computing/)
 
 
 ### MPI (Message Passing Interface)
