@@ -49,3 +49,10 @@
 * [GPU terminology](https://people.eecs.ku.edu/~jrmiller/Courses/675/InClass/GPU/GPUTerminology.html) from James R. Miller
 * [GPU glossary](https://modal.com/gpu-glossary/device-hardware) from modal.com
 
+<br>
+
+GPU programming:
+
+* [GPU terminology](https://people.eecs.ku.edu/~jrmiller/Courses/675/InClass/GPU/GPUTerminology.html) from James R. Miller
+* [GPU glossary](https://modal.com/gpu-glossary/device-hardware) from modal.com
+
