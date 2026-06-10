@@ -174,6 +174,7 @@ julia> @code_native only_sum(A)
 	test	rax, rax
 	je	.LBB0_11
 ...
+```
 So, sometimes it helps. (Note: This here was a reduction. Adding two array is quite a different thing.)
 
 Using compact dot-notation very often helps, if applicable.
