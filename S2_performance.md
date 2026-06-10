@@ -141,6 +141,13 @@ In many cases, with this little information extra, compilers really can do some 
 
 ### Barrier Function Pattern (type-unstable functions) ?
 
+### Inlining
+Function call have slight overhead (despite the statement about "first citizens" in julia). You can try to avoid by inlining functions in julia, where it makes sense, using the `@inline` macro. For instance,
+```julia
+julia> @inline g(x) = x^2
+```
+The function call is then *possibly* replaced by the function body directly.
+"*possibly*": The compiler decides alone whether he really does it! And keep in mind that inlining might make debugging harder (as IPO/LTO does).
 
 
 ## Hands-on
