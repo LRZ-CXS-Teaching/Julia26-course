@@ -7,7 +7,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'JuliaEditorSupport/julia-vim'
 call plug#end()
 ```
-and install the plugin via `:PlugInstall` from inside vim.
+  and install the plugin via `:PlugInstall` from inside vim.
 * useful key codes:
   * `Ctrl+k * X` &rarr; ×   (`\times`, cross-product)
   * `Ctrl+k R T` &rarr; √   (`\sqrt`, square-root)
