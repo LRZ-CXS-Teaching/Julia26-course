@@ -1,19 +1,23 @@
 # Julia 2026 course — Session 1: introduction
 
-## Table of Content
+<br>
+<br>
+
 
 <details>
   <summary>Show Table of Content</summary>
 
-- [1. `juliaup` and Julia installation](#1-juliaup-and-julia-installation)
-- [2. REPL basics](#2-repl-basics)
-- [3. Julia syntax essentials](#3-julia-syntax-essentials)
-- [4. Julia cool stuff](#4-julia-cool-stuff)
-- [5. A package worth mentioning: InteractiveUtils](#5-a-package-worth-mentioning-interactiveutils)
-- [6. BenchmarkTools intro (hands-on setup) (5 min)](#6-benchmarktools-intro-hands-on-setup-5-min)
-  - [Example: benchmark native sum function vs manual implementation](#example-benchmark-native-sum-function-vs-manual-implementation)
-  - [Example: benchmark sorting vector, save result to file and load it back](#example-benchmark-sorting-vector-save-result-to-file-and-load-it-back)
-- [Hands-on](#hands-on)
+- [Julia 2026 course — Session 1: introduction](#julia-2026-course--session-1-introduction)
+  - [1. `juliaup` and Julia installation](#1-juliaup-and-julia-installation)
+  - [2. REPL basics](#2-repl-basics)
+  - [3. Julia syntax essentials](#3-julia-syntax-essentials)
+  - [4. Julia cool stuff](#4-julia-cool-stuff)
+  - [5. A package worth mentioning: InteractiveUtils](#5-a-package-worth-mentioning-interactiveutils)
+  - [6. Introduction to Plots](#6-introduction-to-plots)
+  - [7. BenchmarkTools intro (hands-on setup) (5 min)](#7-benchmarktools-intro-hands-on-setup-5-min)
+    - [Example: benchmark native sum function vs manual implementation](#example-benchmark-native-sum-function-vs-manual-implementation)
+    - [Example: benchmark sorting vector, save result to file and load it back](#example-benchmark-sorting-vector-save-result-to-file-and-load-it-back)
+  - [Hands-on](#hands-on)
 </details>
 
 
@@ -362,9 +366,9 @@ C = @. 2*A + B/2
 Some more tricks:
 
 ```julia
-##################################################52
-
+# ------------------------------------------------------------------------------------------
 # Regex and env vars
+# ------------------------------------------------------------------------------------------
 
 # <https://docs.julialang.org/en/v1/manual/strings/#man-regex-literals>
 ENV                                                         # Dict containing key-value Pairs of all imported env vars
@@ -385,9 +389,9 @@ apropos(r"^code_")          # same as above
 
 
 
-##################################################52
-
+# ------------------------------------------------------------------------------------------
 # Numbers
+# ------------------------------------------------------------------------------------------
 
 # conversion and parsing
 convert(Float64, 5)                 # change values between compatible data types
@@ -418,9 +422,9 @@ sum_kbn(t)      # 1e-100
 
 
 
-##################################################52
-
+# ------------------------------------------------------------------------------------------
 # Miscellanea
+# ------------------------------------------------------------------------------------------
 
 # types
 typeof(3)                   # concrete type of input 
@@ -523,10 +527,95 @@ apropos("@less")                   # help mode calls this under the hood; search
 <br>
 
 
+## 6. Introduction to Plots
+
+Plot backends:
+
+```julia
+using Plots
+
+# Plots.jl is a frontend => it delegates to a backend for actual rendering.
+# Available backends (must be installed separately):
+#   gr()            # GR (default, fast, good for files)
+#   unicodeplots()  # UnicodePlots (terminal, no GUI needed)
+#   pythonplot()    # Matplotlib via PythonCall
+#   plotlyjs()      # Plotly (interactive, browser-based)
+#   gaston()        # Gnuplot
+#   pgfplotsx()     # LaTeX/TikZ output
+
+# Switch backend by calling its function => it will affect all subsequent plots:
+unicodeplots()           # activate UnicodePlots backend
+Plots.backend()          # UnicodePlots.UnicodePlotsBackend()       # check current backend
+Plots.backend_name()     # :unicodeplots
+
+# List ALL supported attributes:
+Plots.supported_attrs()     # full list for current backend
+plotattr(:Plot)             # same, also for :Axis, :Series, :Subplot
+
+
+# Common plot types
+xs = 0:0.01:2pi
+ys = map(x -> sin(x) + 0.05*rand(), xs )
+plot(xs,ys)             # line plot
+scatter(xs, ys)         # scatter
+histogram(ys, bins=50)  # histogram
+stephist(ys, bins=50)   # line histogram
+bar([1,2,3], [4,5,6])   # bar chart
+
+# ------------------------------------------------------------------------------------------
+# Plots with unicodeplots(): rand vs randn
+# ------------------------------------------------------------------------------------------
+N = 10_000;
+u = rand(N);     # uniform [0, 1)
+n = randn(N);    # normal distribution, i.e. Gaussian with μ=0, σ=1
+stephist([u n], label=["rand (Uniform)" "randn (Normal)"], title="Distributions")
+```
+
+<br>
+
+Example with pure `UnicodePlots.jl`:
+
+```julia
+# ------------------------------------------------------------------------------------------
+# Pure UnicodePlots: rand vs randn
+# ------------------------------------------------------------------------------------------
+# NOTE: WE DO NOT IMPORT Plots!!!
+using UnicodePlots          # for the unicode backend
+#unicodeplots()             # activate UnicodePlots backend, not necessary
+N = 10_000; u = rand(N); n = randn(N);
+histogram(u, nbins=100, title="rand (Uniform)", vertical=true)
+histogram(n, nbins=100, title="randn (Normal)", vertical=true)
+```
+
+<br>
 
 
 
-## 6. BenchmarkTools intro (hands-on setup) (5 min)
+Examples with `GR`:
+
+```julia
+using Plots
+gr()            # default, might even be omitted
+
+x = range(0, 10, length=100);
+y1, y2, y3 = sin.(x), cos.(x), @. sin(x)^2 - 1/2;
+p1 = plot(x, y1, title="Trigonometrics", label="sin")
+plot!(p1, x, y2, label="cos", lc=:orange, ls=:dash, lw=1.5, alpha=0.5)
+p2 = plot(x, y3, title="Another function", marker=:square, mc=:green, ms=3)
+p3 = scatter(x, y3, title="Same function", xlims = (0, 3), ylims=(0,2), legend=:topright)
+display(plot(p1, p2, p3, layout=(1,3)))     # side-by-side with layout
+
+# To save a plot to a file, you need a file-capable backend
+savefig(p, "plot.png")   # .png .pdf .svg — format inferred from extension
+```
+
+
+
+<br>
+<br>
+
+
+## 7. BenchmarkTools intro (hands-on setup) (5 min)
 
 <https://juliaci.github.io/BenchmarkTools.jl/stable/manual/>
 

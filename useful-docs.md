@@ -36,9 +36,16 @@
 * [**Book: "Julia High Performance"**](https://juliahighperformance.com/), *A. Sengupta* : focus on performance, benchmarking, and parallelism
 * [**Book: "Hands-On Design Patterns and Best Practices with Julia"**](https://github.com/PacktPublishing/Hands-on-Design-Patterns-and-Best-Practices-with-Julia), *T. Kwong* : good general introduction to julia and design patterns (from a more general software design principles point of view)
 * [Book: "Think Julia"](https://virtualmmx.ddns.net/gbooks/ThinkJulia.pdf), *B. Lauwens, A. B. Downey* : general intro to data science with Julia
-* [**Youtube: "Vendor Neutral GPU Programming in Julia"**](https://youtu.be/QvlBmh1t9I4?si=VppT6jr00dreLWWc)
 * [**Youtube: "Rust, Julia, and Go: Disruptive New Programming Languages Changing the Face of Computing"**](https://youtu.be/6qCH7Y2rc_w?si=XVe7Gkmwqo8W1xJR)
 * [Youtube: "Introduction to Julia: High-Performance Programming for AI"](https://www.youtube.com/watch?v=gnxz9Fs0_Pw) : AI related presentation
 * [Youtube: "Julia for HPC Course 2025"](https://www.youtube.com/watch?v=Fkwr9J_C6oU&list=PLKNFQamVSA_t7VSfBK3Ns4KH_6n3aXvX5)
 * [**Web: "SciML**](https://sciml.ai/) : SciML ecosystem for machine learning [docu](https://docs.sciml.ai/Overview/stable/); (search for contributions of [Chris Rackauckas](https://www.youtube.com/@chrisrackauckasofficial) on Youtube)
+
+<br>
+
+## GPU programming:
+
+* [**Youtube: "Vendor Neutral GPU Programming in Julia"**](https://youtu.be/QvlBmh1t9I4?si=VppT6jr00dreLWWc)
+* [GPU terminology](https://people.eecs.ku.edu/~jrmiller/Courses/675/InClass/GPU/GPUTerminology.html) from James R. Miller
+* [GPU glossary](https://modal.com/gpu-glossary/device-hardware) from modal.com
 
