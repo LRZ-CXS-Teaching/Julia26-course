@@ -213,9 +213,14 @@ shows how threads are placed randomly. Possibly also on top of each other.
 You can use an environment variable `JULIA_EXCLUSIVE=1 julia --threads 4 ...` to pin and place the threads uniquely (as far as possible). From the `ThreadPinning` package, you can even have a finer control via `pinthreads(:cores)`, where you specify a list of CPU IDs, and whether to pin to cores or to sockets. One even can (re-)use a threadpool. (Checkout `??pinthreads`.)
 Use `threadinfo()` to check correctness placement and pinning.
 
+<br>
 
-**Caution!!**
-Packages like [`LinearAlgebra`](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/) (OpenBLAS) and [`MKL`](https://github.com/JuliaLinearAlgebra/MKL.jl) provide own OpenMP thread control. That's somewhat external to julia, i.e. there are no julia threads used. Thread-nesting is not forbidden, but a little dangerous. It requires some care not to over-commit on the given hardware. A sure symptome of such is a vast performance loss (up to even system hang-up).
+
+**Caution!! Pitfalls!!**
+
+Threads are not always a safe programming model! Think about *dead-locks* and *data-races*! You are dealing with threads, that's what you may get.
+
+Furthermore, packages like [`LinearAlgebra`](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/) (OpenBLAS) and [`MKL`](https://github.com/JuliaLinearAlgebra/MKL.jl) provide own OpenMP thread control. That's somewhat external to julia, i.e. there are no julia threads used. Thread-nesting is not forbidden, but a little dangerous. It requires some care not to over-commit on the given hardware. A sure symptome of such is a vast performance loss (up to even system hang-up).
 Use `BLAS.set_num_threads(1)` to set the required number of threads for the BLAS workflows. 
 
 That's not of an issue if you run your julia programs serially. Then you can use all CPUs avaiable for the linear algebra stuff.
@@ -239,6 +244,29 @@ and the `BenchmarkTools`.
 
 
 ### MPI (Message Passing Interface)
+If you have more complicated parallel workflow structures, and possibly a need to work across several computers (be it simply for requirements of more processing units to accelerate the execution, or be it memory requirements per note mitigation for large simulations), the now traditional way is to use the [Message Passing Interface](https://en.wikipedia.org/wiki/Message_Passing_Interface) (MPI).
+
+Julia provides a rather complete API for it in the [MPI](https://juliaparallel.org/MPI.jl/stable/) package. The installation can be a bit troublesome depending on whether you can live with the provided MPI implementation that julia installs, or whether you want to interface the system MPI installation. Both is feasible.
+
+Another complexity is then to gauge and use the MPI workflows (not part of this course).
+
+But let's assume these issues are all solved, the usage is pretty simple. Let's take the "hello-world" example from the docu page.
+```shell
+> cat MPI-hello.jl
+using MPI
+MPI.Init()
+comm = MPI.COMM_WORLD
+println("Hello world, I am $(MPI.Comm_rank(comm)) of $(MPI.Comm_size(comm))")
+MPI.Finalize()
+
+> mpiexec -n 4 julia -- ./MPI-hello.jl
+Hello world, I am 1 of 4
+Hello world, I am 0 of 4
+Hello world, I am 2 of 4
+Hello world, I am 3 of 4
+```
+
+That's it. More I cannot do for you at the moment. (Means, from julia-pov, we are done. The rest is to learn to use MPI itself, and the related programming models.)
 
 
 ## Hands-on
