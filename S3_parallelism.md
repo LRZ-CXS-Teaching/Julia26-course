@@ -93,7 +93,7 @@ julia> @code_native C = A .+ B
 ```
 This example is of course not very useful here. The element-wise addition of two arrays is already memory-bandwidth bound. One doesn't gain here much through vectorization, as the CPU mostly waits for the data from the memory/caches. The compiler here vectorizes only to ymm-registers (AVX2) instead of zmm-registers (AVX512), as it "knows" that. And vectorization comprises also some overhead which is larger for wider vector-registers.
 
-Conclusion: We can mostly rely on LLVM here to give us a good-compromize performance. If not, work gets harder to figure out why loops aren't vectorized, and to make the compiler to rethink its decision. There are macros like `@simd`, and packages like [`SIMD`](https://github.com/eschnett/SIMD.jl) and [`LoopVectorization`](https://github.com/JuliaSIMD/LoopVectorization.jl) (`@turbo`). But eventually, one needs to really look into the compiled code to see whether vectorization was done.
+Conclusion: We can mostly rely on LLVM here to give us a good-compromize performance. If not, work gets harder to figure out why loops aren't vectorized, and to make the compiler to rethink its decision. There are macros like `@simd`, and packages like [`SIMD`](https://github.com/eschnett/SIMD.jl) and [`LoopVectorization`](https://github.com/JuliaSIMD/LoopVectorization.jl) (`@turbo`). But eventually, one needs to really look into the compiled code to see whether vectorization was done. At the end, the compiler decides (similar as for inlining - `@inline`).
 
 For instance,
 ```julia
@@ -176,6 +176,7 @@ julia> @code_native only_sum(A)
 ...
 ```
 So, sometimes it helps. (Note: This here was a reduction. Adding two array is quite a different thing.)
+`@inbounds` deactivates the bound checking. It's for performance.
 
 Using compact dot-notation very often helps, if applicable.
 
@@ -210,8 +211,32 @@ Thread-to-CPU placement and pinning. For HPC (performance), it is essential to f
 shows how threads are placed randomly. Possibly also on top of each other.
 
 You can use an environment variable `JULIA_EXCLUSIVE=1 julia --threads 4 ...` to pin and place the threads uniquely (as far as possible). From the `ThreadPinning` package, you can even have a finer control via `pinthreads(:cores)`, where you specify a list of CPU IDs, and whether to pin to cores or to sockets. One even can (re-)use a threadpool. (Checkout `??pinthreads`.)
+Use `threadinfo()` to check correctness placement and pinning.
+
+
+**Caution!!**
+Packages like [`LinearAlgebra`](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/) (OpenBLAS) and [`MKL`](https://github.com/JuliaLinearAlgebra/MKL.jl) provide own OpenMP thread control. That's somewhat external to julia, i.e. there are no julia threads used. Thread-nesting is not forbidden, but a little dangerous. It requires some care not to over-commit on the given hardware. A sure symptome of such is a vast performance loss (up to even system hang-up).
+Use `BLAS.set_num_threads(1)` to set the required number of threads for the BLAS workflows. 
+
+That's not of an issue if you run your julia programs serially. Then you can use all CPUs avaiable for the linear algebra stuff.
+
+To get some feeling for it, play a bit with
+```julia
+julia> using LinearAlgebra
+
+julia> A = rand(Float64,100,100);
+
+julia> b = rand(Float64,100);
+
+julia> x = A\b
+...
+```
+and the `BenchmarkTools`.
+
 
 ### Task-Parallelism (distributed, pmap)
+
+
 
 ### MPI (Message Passing Interface)
 
