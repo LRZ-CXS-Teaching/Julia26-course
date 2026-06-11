@@ -321,7 +321,20 @@ end
 
 Threads are not always a safe programming model! Think about *dead-locks* and *data-races*! You are dealing with threads, that's what you may get.
 
-It is possible to spawn and join threads arbitrarily. There's really a lot of freedom and flexibility. But that comes at price. If threads share common data structures, synchronization like *locks* are required in order to prevent data-races. And locks in turn are prone to dead-locks. That's specific to threads! Not to julia.
+It is possible to spawn and join threads arbitrarily. Here is an example of explicit thread creation from the direct-help.
+```julia
+julia> Threads.nthreads()
+4
+
+julia> t() = println("Hello from ", Threads.threadid());
+
+julia> tasks = fetch.([Threads.@spawn t() for i in 1:Threads.nthreads()]);
+Hello from 2
+Hello from 5
+Hello from 4
+Hello from 3
+```
+There's really a lot of freedom and flexibility. But that comes at a price. If threads share common data structures, synchronization like *locks* are required in order to prevent data-races. And locks in turn are prone to dead-locks. That's specific to threads! Not to julia.
 
 <br>
 
