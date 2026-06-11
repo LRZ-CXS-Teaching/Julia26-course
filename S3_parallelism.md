@@ -562,7 +562,7 @@ Conclusion: Workers are independent julia instances (processes) that communicate
 Depending on you workflows, you can send data with function, or "allocate" data on the workers (via `@spawnat` or `@everywhere`). There are modules like [`SharedArrays`](https://docs.julialang.org/en/v1/stdlib/SharedArrays/) (on single machine) and [`DistributedArray`](https://juliaparallel.org/DistributedArrays.jl/stable/) (across several machines).
 
 <details>
-	<summary>Lattice Stencil Update Example</summary>
+	<summary>Stencil Lattice Update Example</summary>
 
 Here is an example how one could realize a simple stencil update scheme (here, for diffusion equation with diffusion constant `c` in finite difference discretization).
 ```julia
