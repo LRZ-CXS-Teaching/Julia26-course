@@ -240,8 +240,10 @@ and the `BenchmarkTools`.
 
 
 ### Task-Parallelism (Distributed, pmap)
-TODO:
-[Multi-processing and Distributed Computing](https://docs.julialang.org/en/v1/manual/distributed-computing/)
+Next to threading, julia offers another very versatile parallel programming model for CPU systems ... even for multi-systems. The [Distributed](https://github.com/JuliaLang/Distributed.jl) provides support for so-called server-client/master-slave parallelism. Some master controls and distributes workload to other workers. A rather comprehensive documenation can be found here: [Multi-processing and Distributed Computing](https://docs.julialang.org/en/v1/manual/distributed-computing/).
+
+
+
 
 
 ### MPI (Message Passing Interface)
@@ -266,6 +268,9 @@ Hello world, I am 0 of 4
 Hello world, I am 2 of 4
 Hello world, I am 3 of 4
 ```
+
+This can, of course, be combined with `Threads` as well - so-called "hybrid MPI+X" programming schemes. Just again, take care not to overcommit on the hardware!
+I would not try to combine that with the `Distributed` parallelism, though!
 
 That's it. More I cannot do for you at the moment. (Means, from julia-pov, we are done. The rest is to learn to use MPI itself, and the related programming models.)
 
