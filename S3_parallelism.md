@@ -780,5 +780,5 @@ That's it. More I cannot do for you at the moment. (Means, from julia-pov, we ar
 
 ## Hands-on
 
-- Ray-Tracing / Path-Tracing (Visualization)
+- [`Ray-Tracing / Path-Tracing (Visualization)`](hands-on/S03/Ray_Path_Tracing.md)
 - PDE Solution (?)
