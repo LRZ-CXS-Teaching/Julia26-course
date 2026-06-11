@@ -271,10 +271,11 @@ What do you observe?
 
 Hint: Repeat the measurements. What happens the first time? Is it faster? If so, how much faster?
 
+
 <details>
 	<summary>Conclusion</summary>
 
-Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
+Maybe better use `LinearAlgebra` for that ... `C = A * B`. ;) (Yes. That's also threaded, if you want, and really optimized ... see below.)
 
 Btw. here a small script how scaling tests could be done. There is unfortunately no way to set the number of threads from inside a julia script.
 ```julia
@@ -363,8 +364,6 @@ A result may look as follows.
   <img src="miscellanea/images/scaling_plot.png" width="800" alt="scaling plot">
 </div>
 </details>
-
-Conclusion: Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
 
 #### Nested Loops
 
