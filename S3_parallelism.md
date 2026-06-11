@@ -565,8 +565,9 @@ Depending on you workflows, you can send data with function, or "allocate" data 
 	<summary>Kernel Update Example</summary>
 </details>
 
+#### Map-Reduce - pmap (jobfarming)
 
-
+#### SlurmClusterManager Extension
 
 
 ### MPI (Message Passing Interface)
