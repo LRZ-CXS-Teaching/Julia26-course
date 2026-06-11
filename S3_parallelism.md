@@ -652,11 +652,101 @@ The final fetch of an array is debatable in HPC circumstances. Usually, it is mo
 </details>
 
 #### Map-Reduce - pmap (jobfarming)
+If you have some sort of collection (yes, it is so abstract!) - e.g. a list of different input parameters - to which you want to apply element-wise some function, then probably `pmap` is the ideal mean.
+
+An example shall illustrate this. Imagine, you want to know how many numbers there are between 1 and say 100000 divisable by 13. Using `pmap`, it goes like that.
+```julia
+julia> pmap(x -> x % 13 == 0 ? 1 : 0 , 1:100_000)
+```
+This returns an array of 0's and 1's. 1, if division modulo 13 results in zero (statement is true). To count all the single 1's, we can use `sum`, or, more generally, `reduce`.
+```julia
+julia> sum(pmap(x -> x % 13 == 0 ? 1 : 0 , 1:100_000))
+7692
+
+julia> reduce(+, pmap(x -> x % 13 == 0 ? 1 : 0 , 1:100_000))
+7692
+```
+`reduce` has the benefit that we can use any kind of operation here. Not only addition.
+
+The clue now is that it works transparently also with workers.
+```julia
+julia> nworkers()
+1
+
+julia> reduce(+, pmap(x -> x % 13 == 0 ? 1 : 0 , 1:100_000))
+
+julia> addprocs(4);
+
+julia> reduce(+, pmap(x -> x % 13 == 0 ? 1 : 0 , 1:100_000))     # schedules to 4 workers 
+```
+The benefit for this example is negative. `pmap` comes with quite some overhead. But if the collection (`1:100_000`) is huge, or the function applied a heavy computation, then parallelism can outweigh and even more these overhead costs.
+
+<details>
+	<summary>Jobfarming with Bookkeeping</summary>
+
+If you have a lot of independent tasks - e.g. you want to run some program independently with many parameters for, say, uncertainty quantification, or, you want to process a bunch of input files with a program, where even file can be processed independently - and some program that should be executed in a shell (doing that directly in Julia would of course be much more efficient ;) ). Such a "job farmer" in julia can be realized as follows.
+
+```julia
+using Distributed
+
+# setup OpenMP if julia was started with -t option, and the program is OpenMP parallel
+try ENV["OMP_NUM_THREADS"] = nthreads() catch end
+
+# create workers
+nworkers() == 1 && addprocs(4)
+
+@everywhere using Dates
+@everywhere function do_work(x)
+  myID = myid()
+  outfile = open("$x","a")
+  println(outfile,"Task ID $x on worker $myID")
+  starttime = Dates.now()
+  println(outfile,"** START = $x = $myID = $starttime")
+  try
+    line = open(readlines, "taskdb.txt")[x]
+    println(outfile,"command: $line")
+    write(outfile,read(Cmd(`sh -c "$line"`)))    							# <-- task executed
+    endtime = Dates.now()
+    elapsed = (endtime - starttime).value/60000  ## in minutes
+    println(outfile,"** STOP SUCCESS = $x = $myID = $endtime = $elapsed")
+  catch err
+    println(outfile,"** STOP FAILED = $x = $myID = ", Dates.now())
+  end
+  close(outfile)
+end
+
+# check for already executed tasks and remove from TODO list (bookkeeping)
+task_ID_list = []
+for x in 1:countlines("taskdb.txt")
+  if isfile("$x")
+    if length(filter(line -> occursin(r"\*\* STOP ",line),readlines(open("$x")))) > 0
+      continue
+    end
+  end
+  push!(task_ID_list,x)
+end
+
+pmap(do_work, task_ID_list)
+
+for i in workers()
+  rmprocs(i)
+end
+```
+All that's now required is a file named `taskdb.txt`, with each line containing one command. This Julia script can be executed then with `-p` in order to specify the number of workers. And it can run repeatedly until all tasks were processed. 
+</details>
 
 #### SlurmClusterManager Extension
+If you need to work on several nodes - memory requirements, or scaling through parallelism larger to get your production through, `Distributed` can be combined with cluster managers. We have only experience with [`SlurmClusterManager`](https://github.com/JuliaParallel/SlurmClusterManager.jl), so we can only show this here. All that's necessary is
+```julia
+using Distributed, SlurmClusterManager
+addprocs(SlurmManager())
+```
+That's really it. The rest is configured via the Slurm `sbatch` parameters (`--nodes`, `--ntasks-per-node`, ...). The SlurmManager runs srun under the hood to distribute the workers to the respective Slurm tasks on the allocated nodes.
 
 #### Final Remark
-`Distributed` can be combined with threads. Beware of overcommitment!
+`Distributed` can be combined with threads. Specifically, `pmap` can distribute/schedule work on workers, where each might run on several threads, in order to execute the function faster. 
+
+Beware of overcommitment!
 
 
 ### MPI (Message Passing Interface)
