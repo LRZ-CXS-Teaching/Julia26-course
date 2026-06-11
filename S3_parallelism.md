@@ -272,8 +272,90 @@ What do you observe?
 Hint: Repeat the measurements. What happens the first time? Is it faster? If so, how much faster?
 
 <details>
-	<summary>**Conclusion**</summary>
+	<summary>Conclusion</summary>
 	Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
+
+	Btw. here a small script how scaling tests could be done. There is unfortunately no way to set the number of threads from inside a julia script.
+	```julia
+	using Plots
+	using Serialization
+
+	thread_bereich = 1:Threads.nthreads()
+	results = Float64[]
+
+	@info "Starte automatisierte Benchmarks über $thread_bereich Threads..."
+
+	for t in thread_bereich
+    	@info "Benchmark läuft im Subprozess mit t = $t Threads..."
+    
+    	# Dieser Code-Block wird als Text an den Subprozess übergeben
+    	julia_code = """
+	    using BenchmarkTools
+    	using Serialization
+    	using LoopVectorization
+
+    	function matmul_tturbo!(C, A, B)
+        	@tturbo for j in axes(B, 2), i in axes(A, 1)
+            	Cij = 0.0
+            	for k in axes(A, 2)
+                	Cij += A[i, k] * B[k, j]
+            	end
+            	C[i, j] = Cij
+        	end
+    	end
+    
+    	A = rand(1000,1000)
+    	B = rand(1000,1000)
+    	C = similar(A)
+
+    	# Warmup
+    	matmul_tturbo!(C, A, B)
+    
+    	b = @benchmark matmul_tturbo!(C, A, B) 
+    
+    	time_ms = mean(b).time / 1e6
+    
+    	serialize("temp_time.dat", time_ms)
+    	"""
+    
+    	run(`julia -t $t -e $julia_code`)
+    
+    	time = deserialize("temp_time.dat")
+    	push!(results, time)
+	end
+
+	rm("temp_time.dat", force=true)
+
+	@info "Benchmarks abgeschlossen. Generiere Plots..."
+
+	p1 = plot(thread_bereich, results, 
+          markershape = :circle, 
+          xlabel = "# threads", 
+          ylabel = "runtime (ms)", 
+          title = "absolute runtime", 
+          label = "measurement", 
+          lw = 2)
+
+	speedup = results[1] ./ results
+
+	p2 = plot(thread_bereich, speedup, 
+          markershape = :square, 
+          xlabel = "# threads", 
+          ylabel = "speed-up", 
+          title = "scaling (speed-up)", 
+          label = "measures speed-up", 
+          lw = 2,
+          legend = :topleft)
+
+	plot!(p2, thread_bereich, thread_bereich, 
+      label = "idealer speed-up", 
+      linestyle = :dash, 
+      color = :black)
+
+	plot(p1, p2, layout = (1, 2), size = (800, 400))
+
+	savefig("scaling_plot.pdf")
+	```
 </details>
 
 Conclusion: Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
