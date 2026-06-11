@@ -359,6 +359,9 @@ savefig("scaling_plot.pdf")
 
 A result may look as follows.
 
+<div align="center">
+  <img src="miscellanea/images/scaling_plot.png" width="800" alt="scaling plot">
+</div>
 </details>
 
 Conclusion: Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
