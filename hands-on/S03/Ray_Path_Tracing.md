@@ -247,7 +247,7 @@ image = render_image(camera, shapes, LightSource())
 save("render_result.png", image)
 # -------------- Scene Setup and Rendering --------------------
 ```
-<details>
+</details>
 
 This program is admittedly already a bit more complex. It is supposed to be extended with shapes other then only spheres. Or, material properties can be extended - though the solution for the following path-tracing is imho more appealing.
 
