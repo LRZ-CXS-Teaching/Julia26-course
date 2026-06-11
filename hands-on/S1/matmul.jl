@@ -13,9 +13,9 @@ using Printf
 function matmul_columnmajor!(C, A, B)
     M, K = size(A)
     _, N = size(B)
-    @inbounds for ... in ...                # FIX-ME!
-        C[m, n] += A[m, k] * B[k, n]
-    end
+    #@inbounds for ... in ...                # FIX-ME!
+    #    C[m, n] += A[m, k] * B[k, n]
+    #end
     return nothing
 end
 
@@ -23,9 +23,9 @@ end
 function matmul_rowmajor!(C, A, B)
     M, K = size(A)
     _, N = size(B)
-    @inbounds for ... in ...                # FIX-ME!
-        C[m, n] += A[m, k] * B[k, n]
-    end
+    #@inbounds for ... in ...                # FIX-ME!
+    #    C[m, n] += A[m, k] * B[k, n]
+    #end
     return nothing
 end
 

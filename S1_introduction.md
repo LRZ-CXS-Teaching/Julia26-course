@@ -1,12 +1,5 @@
 # Julia 2026 course — Session 1: introduction
 
-<br>
-<br>
-
-
-<details>
-  <summary>Show Table of Content</summary>
-
 - [Julia 2026 course — Session 1: introduction](#julia-2026-course--session-1-introduction)
   - [1. `juliaup` and Julia installation](#1-juliaup-and-julia-installation)
   - [2. REPL basics](#2-repl-basics)
@@ -17,8 +10,12 @@
   - [7. BenchmarkTools intro (hands-on setup) (5 min)](#7-benchmarktools-intro-hands-on-setup-5-min)
     - [Example: benchmark native sum function vs manual implementation](#example-benchmark-native-sum-function-vs-manual-implementation)
     - [Example: benchmark sorting vector, save result to file and load it back](#example-benchmark-sorting-vector-save-result-to-file-and-load-it-back)
-  - [Hands-on](#hands-on)
-</details>
+
+<br>
+<br>
+
+
+
 
 
 ## 1. `juliaup` and Julia installation
@@ -144,11 +141,32 @@ convert(Dict{String, Int64}, phones)
 
 # arrays (1-INDEXED!!!)
 fibonacci = [1, 1, 2, 3, 5, 8, 13]  # MUTABLE
+fibonacci[1]
+fibonacci[end]
 push!(fibonacci, 21)
 pop!(fibonacci)
-shallow = fibonacci; shallow[1] = 404; fibonacci        # SHALLOW COPY
-fibonacci[1] = 1
-deep = copy(fibonacci); deep[1] = 11; fibonacci         # DEEP COPY
+# NOTE: deep vs shallow copy in Julia
+#     * = does not copy data, it binds a new name to the same object
+#     * copy(x) makes a new OUTER container with same values
+#     * deepcopy(x) recursively copies everything it finds inside
+# ---------- = ----------
+v = [1, 1, 2, 3, 5, 8, 13];
+s = v;              # SHALLOW COPY: v and s are the same array
+s[1] = 404; println("v===s: $(v===s) \t v = $v")  
+# ---------- copy (flat array) ----------
+v = [1, 1, 2, 3, 5, 8, 13];
+d = copy(v);        # DEEP COPY: with flat arrays, copy creates a new array
+d[1] = 404; println("v===d: $(v===d) \t v = $v")
+# => for a flat vector of numbers, copy is enough: the elements are plain values, not separate mutable objects
+# ---------- copy (nested array) ----------
+v = [[1, 1, 2, 3, 5, 8, 13]];
+s = copy(v);        # SHALLOW COPY: v and s are the same array
+s[1][1] = 404; println("v===s: $(v===s) \t v[1]===s[1]: $(v[1]===s[1]) \t v = $v")
+# ---------- deepcopy ----------
+v = [[1, 1, 2, 3, 5, 8, 13]];
+d = deepcopy(v);     # DEEP COPY: deepcopy recursively copies all levels
+d[1][1] = 404; println("v===d: $(v===d) \t v[1]===s[1]: $(v[1]===s[1]) \t v = $v")
+
 # matrixes (1-INDEXED!!!)
 v = [ 1, 2, 3 ]                     # 3-element Vector{Int64}, I.E. 3×1 Matrix{Int64}
 A = [ 1  2  3 ]                     # 1×3 Matrix{Int64}
@@ -419,6 +437,47 @@ sum(t)          # 0.0
 ] add KahanSummation
 using KahanSummation
 sum_kbn(t)      # 1e-100
+
+
+# ------------------------------------------------------------------------------------------
+# Deep dive into equality operators
+# ------------------------------------------------------------------------------------------
+#     =        : assignment: binds a new name to the same object
+#     ==       : value equality: same contents?
+#     ===      : identity: literally the same object in memory?
+#     ≈        : approximate numerical equality
+#     isapprox : like ≈ but with tunable atol, rtol, etc
+#     isequal  : equality used by Dict/Set (handles NaN, -0.0 carefully)
+
+a = [1, 2, 3]
+
+b = a              # no copy: a and b are the same array
+a == b             # true   -> same contents
+a === b            # true   -> same object
+
+c = copy(a)         # new array, same values
+a == c              # true   -> same contents
+a === c             # false  -> different objects
+
+x = 0.1 + 0.2
+y = 0.3
+x == y              # false  -> floating-point roundoff
+x ≈ y               # true   -> close enough
+x == y + eps(x)     # true 
+
+NaN == NaN          # false: IEEE floating-point standard says NaN is not equal to anything, including itself
+isequal(NaN, NaN)   # true: useful for keys in Dict/Set
+d = Dict(NaN => "hello"); d[NaN]        # "hello": dicts use isequal for lookup, not ==
+
+u = [[1, 2, 3]]
+
+v = copy(u)         # copies outer array only
+u == v              # true
+u === v             # false: the outer container is not the same object
+u[1] === v[1]       # true: the inner array is shared
+
+w = deepcopy(u)     # copies outer and inner arrays
+u[1] === w[1]       # false: deepcopy allocates new arrays
 
 
 
@@ -703,51 +762,4 @@ res[1]
 ```
 
 
-<br>
-<br>
-<br>
-
-
-
----
-
-
-## Hands-on
-
-Let's consider the following classical matrix multiplication:
-
-```math
-C = A * B + C \quad \\[10pt]
-\mathrm{dim}(A) = M \times K \;\, , \quad 
-\mathrm{dim}(B) = K \times N \;\, , \quad 
-\mathrm{dim}(C) = M \times N \;\, , \quad 
-```
-
-In a manual naive implementation, that would look like:
-
-```julia
-for m in 1:M
-    for k in 1:K
-        for n in 1:N
-            C[m, n] += A[m, k] * B[k, n]
-        end
-    end
-end
-```
-
-BUT, as in many other programming language, depending on how the data of a matrix are stored in memory,
-the loop order makes a HUGE difference in terms of performance.
-E.g.: Fortran is column-major, C is row-major.
-
-Have a look at the `./matmul_hands-on.jl` file: complete the `matmul_columnmajor!` and `matmul_rowmajor!`
-functions with the appropriate loop order.
-Then, run the benchmarking with:
-
-```bash
-julia> include("./matmul_hands-on.jl")
-```
-
-**QUESTION 1**: What does the benchmarking tell us about how Julia stores matrixes?
-
-**QUESTION 2**: There are 2 native methods benchmarked; do they perform the same? (spoiler: no) why?
 
