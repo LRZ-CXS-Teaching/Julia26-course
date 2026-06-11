@@ -272,10 +272,14 @@ What do you observe?
 Hint: Repeat the measurements. What happens the first time? Is it faster? If so, how much faster?
 
 <details>
+	
 	<summary>Conclusion</summary>
 
 	Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
+
 </details>
+
+Conclusion: Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
 
 #### Nested Loops
 
