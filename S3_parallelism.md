@@ -503,6 +503,69 @@ julia> r = fetch(a)                  # when result available, show us
 We executed the function `myid`, which returns the worker ID, on worker 2. The "future" is stored in `a`. Later, we can `fetch` the future's result, and store it in `r`.
 (Careful!! Removing and adding processes/workers might be confusing. The worker IDs once used are never reused. Better avoid this jumble!)
 
+To do something useful, one usually defines some function that is then spawned to some or all workers (or so). Much like `myid()` above. But doing so naively like here,
+```shell
+> julia -p 1                          # one additional worker
+...
+julia> g(x) = x^2;
+
+julia> a = @spawnat 2 g(3)
+
+julia> b = fetch(a)
+ERROR: On worker 2:
+UndefVarError: `#g` not defined in `Main`
+...
+```
+awfully fails. What happened is that `g` is not known on worker 2. We first must declare it there. So, once again, and this time correctly.
+```shell
+> julia -p 1
+...
+julia> @everywhere g(x) = x^2;        # do that on all workers
+
+julia> a = @spawnat 2 g(3)
+
+julia> b = fetch(a)
+9                                      # Yippie!
+```
+
+This opens some other problem now, too. One needs to care for data handling at the workers. With `@everywhere data = [1,2,3,4,5]`, you can create an array on each worker. Let's look at the following example.
+```julia
+julia> @everywhere data = [1,2,3,4,5]
+
+julia> @everywhere modify() = data[1]=10; 
+
+julia> a = @spawnat 2 modify()
+Future(2, 1, 20, ReentrantLock(), nothing)
+
+julia> fetch(a)
+10
+
+julia> @everywhere @show data
+data = [1, 2, 3, 4, 5]
+      From worker 2:	data = [10, 2, 3, 4, 5]
+```
+Oops! ... Data are worker-local!
+
+And how do I move data then? Some functions like `remotecall_fetch` can take care for it.
+```julia
+julia> locale_data = [10, 20, 30]
+
+julia> ergebnis = remotecall_fetch(sum, 2, local_data)
+60
+
+julia> @everywhere @show locale_daten
+ERROR: On worker 2:
+UndefVarError: `locale_daten` not defined in `Main`
+```
+Conclusion: Workers are independent julia instances (processes) that communicate with each other through functions. And data must be handled/send manually.
+
+Depending on you workflows, you can send data with function, or "allocate" data on the workers (via `@spawnat` or `@everywhere`). There are modules like [`SharedArrays`](https://docs.julialang.org/en/v1/stdlib/SharedArrays/) (on single machine) and [`DistributedArray`](https://juliaparallel.org/DistributedArrays.jl/stable/) (across several machines).
+
+<details>
+	<summary>Kernel Update Example</summary>
+</details>
+
+
 
 
 
