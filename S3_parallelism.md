@@ -205,7 +205,7 @@ A simple way to check that is to reserse the order of loop iterations, and check
 
 Instead of `--threads`, also `-t` can be used. Thread IDs don't start with 1 (kept for the main julia process)!
 
-<br>
+
 
 #### HPC related Issues
 
@@ -217,6 +217,13 @@ shows how threads are placed randomly. Possibly also on top of each other.
 
 You can use an environment variable `JULIA_EXCLUSIVE=1 julia --threads 4 ...` to pin and place the threads uniquely (as far as possible). From the `ThreadPinning` package, you can even have a finer control via `pinthreads(:cores)`, where you specify a list of CPU IDs, and whether to pin to cores or to sockets. One even can (re-)use a threadpool. (Checkout `??pinthreads`.)
 Use `threadinfo()` to check correctness placement and pinning.
+
+<br>
+
+The combination of SIMD and threads is a bit more cumbersome. The simplest way is maybe again via [`LoopVectorization`](https://github.com/JuliaSIMD/LoopVectorization.jl), and the `@tturbo` macro,
+```julia
+WEITER HIER
+```
 
 #### Nested Loops
 
