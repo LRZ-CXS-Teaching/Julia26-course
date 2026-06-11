@@ -273,23 +273,23 @@ Hint: Repeat the measurements. What happens the first time? Is it faster? If so,
 
 <details>
 	<summary>Conclusion</summary>
-	Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
-	<br>
-	Btw. here a small script how scaling tests could be done. There is unfortunately no way to set the number of threads from inside a julia script.
-	```julia
-	using Plots
-	using Serialization
 
-	thread_bereich = 1:Threads.nthreads()
-	results = Float64[]
+Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
 
-	@info "Starte automatisierte Benchmarks über $thread_bereich Threads..."
+Btw. here a small script how scaling tests could be done. There is unfortunately no way to set the number of threads from inside a julia script.
+```julia
+using Plots
+using Serialization
 
-	for t in thread_bereich
-    	@info "Benchmark läuft im Subprozess mit t = $t Threads..."
+thread_bereich = 1:Threads.nthreads()
+results = Float64[]
+
+@info "Start automated benchmarks on $thread_bereich threads..."
+
+for t in thread_bereich
+   	@info "Benchmark running in subprozess with t = $t threads..."
     
-    	# Dieser Code-Block wird als Text an den Subprozess übergeben
-    	julia_code = """
+   	julia_code = """
 	    using BenchmarkTools
     	using Serialization
     	using LoopVectorization
@@ -316,19 +316,19 @@ Hint: Repeat the measurements. What happens the first time? Is it faster? If so,
     	time_ms = mean(b).time / 1e6
     
     	serialize("temp_time.dat", time_ms)
-    	"""
+   	"""
     
-    	run(`julia -t $t -e $julia_code`)
+   	run(`julia -t $t -e $julia_code`)
     
-    	time = deserialize("temp_time.dat")
-    	push!(results, time)
-	end
+   	time = deserialize("temp_time.dat")
+   	push!(results, time)
+end
 
-	rm("temp_time.dat", force=true)
+rm("temp_time.dat", force=true)
 
-	@info "Benchmarks abgeschlossen. Generiere Plots..."
+@info "Benchmarks finished. Generate plots..."
 
-	p1 = plot(thread_bereich, results, 
+p1 = plot(thread_bereich, results, 
           markershape = :circle, 
           xlabel = "# threads", 
           ylabel = "runtime (ms)", 
@@ -336,9 +336,9 @@ Hint: Repeat the measurements. What happens the first time? Is it faster? If so,
           label = "measurement", 
           lw = 2)
 
-	speedup = results[1] ./ results
+speedup = results[1] ./ results
 
-	p2 = plot(thread_bereich, speedup, 
+p2 = plot(thread_bereich, speedup, 
           markershape = :square, 
           xlabel = "# threads", 
           ylabel = "speed-up", 
@@ -347,15 +347,15 @@ Hint: Repeat the measurements. What happens the first time? Is it faster? If so,
           lw = 2,
           legend = :topleft)
 
-	plot!(p2, thread_bereich, thread_bereich, 
+plot!(p2, thread_bereich, thread_bereich, 
       label = "idealer speed-up", 
       linestyle = :dash, 
       color = :black)
 
-	plot(p1, p2, layout = (1, 2), size = (800, 400))
+plot(p1, p2, layout = (1, 2), size = (800, 400))
 
-	savefig("scaling_plot.pdf")
-	```
+savefig("scaling_plot.pdf")
+```
 </details>
 
 Conclusion: Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
