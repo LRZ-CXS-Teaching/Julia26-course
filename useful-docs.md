@@ -40,6 +40,7 @@
 * [Youtube: "Introduction to Julia: High-Performance Programming for AI"](https://www.youtube.com/watch?v=gnxz9Fs0_Pw) : AI related presentation
 * [Youtube: "Julia for HPC Course 2025"](https://www.youtube.com/watch?v=Fkwr9J_C6oU&list=PLKNFQamVSA_t7VSfBK3Ns4KH_6n3aXvX5)
 * [**Web: "SciML**](https://sciml.ai/) : SciML ecosystem for machine learning [docu](https://docs.sciml.ai/Overview/stable/); (search for contributions of [Chris Rackauckas](https://www.youtube.com/@chrisrackauckasofficial) on Youtube)
+* [Book: "Patterns for Parallel Programming"](https://www.amazon.de/-/en/Patterns-Parallel-Programming-Software/dp/0321228111), "T. G. Mattson" & Co. : good intro intro to and overview of parallel design patterns (generically applicable for all parallel programming languages)
 
 <br>
 
