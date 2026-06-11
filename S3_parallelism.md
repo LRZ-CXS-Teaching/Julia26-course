@@ -255,7 +255,7 @@ function matmul_tturbo!(C, A, B)
     end
 end
 ```
-**Inline Task:** Please, benchmark the both functions with the matrixes:
+**Inline Task:** Please, benchmark both functions with the following matrixes.
 ```julia
 A = rand(1000,1000);
 B = rand(1000,1000);
@@ -271,7 +271,11 @@ What do you observe?
 
 Hint: Repeat the measurements. What happens the first time? Is it faster? If so, how much faster?
 
-Conclusion: Maybe better use `LinearAlgebra` for that ... `C = A * B`. ;) (Yes. That's also threaded ... see below.)
+<details>
+	<summary>Conclusion</summary>
+
+	Maybe better use `LinearAlgebra` for that ... `C = A * B`. ;) (Yes. That's also threaded ... see below.)
+</details>
 
 #### Nested Loops
 
@@ -338,7 +342,7 @@ There's really a lot of freedom and flexibility. But that comes at a price. If t
 <br>
 
 Furthermore, packages like [`LinearAlgebra`](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/) (OpenBLAS) and [`MKL`](https://github.com/JuliaLinearAlgebra/MKL.jl) provide own OpenMP thread control. That's somewhat external to julia, i.e. there are no julia threads used. Thread-nesting is not forbidden, but a little dangerous. It requires some care not to over-commit on the given hardware. A sure symptome of such is a vast performance loss (up to even system hang-up).
-Use `BLAS.set_num_threads(1)` to set the required number of threads for the BLAS workflows. 
+Use `BLAS.set_num_threads(1)` to set the required number of threads for the BLAS workflows. (Environment variables like `OPENBLAS_NUM_THREADS` and `MKL_NUM_THREADS`, or more general, `OMP_NUM_THREADS`, can also be used.)
 
 That's not of an issue if you run your julia programs serially. Then you can use all CPUs avaiable for the linear algebra stuff.
 
