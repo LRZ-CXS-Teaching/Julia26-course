@@ -200,9 +200,14 @@ Using threading is rather simple.
 4
 4
 ```
-**So, usage is simple! Only go sure that there are no loop-carried dependencies!!**
+**So, usage is simple! Annotate the for-loops. Only go sure that there are no loop-carried dependencies!!**
+A simple way to check that is to reserse the order of loop iterations, and checking whether the result is still the same.
 
 Instead of `--threads`, also `-t` can be used. Thread IDs don't start with 1 (kept for the main julia process)!
+
+<br>
+
+#### HPC related Issues
 
 Thread-to-CPU placement and pinning. For HPC (performance), it is essential to fix the threads on certain CPUs, and especially not to let several threads run on the same CPU. The `ThreadPinning` package can help here.
 ```shell
@@ -213,12 +218,56 @@ shows how threads are placed randomly. Possibly also on top of each other.
 You can use an environment variable `JULIA_EXCLUSIVE=1 julia --threads 4 ...` to pin and place the threads uniquely (as far as possible). From the `ThreadPinning` package, you can even have a finer control via `pinthreads(:cores)`, where you specify a list of CPU IDs, and whether to pin to cores or to sockets. One even can (re-)use a threadpool. (Checkout `??pinthreads`.)
 Use `threadinfo()` to check correctness placement and pinning.
 
-<br>
+#### Nested Loops
 
+Another point are the loops themselves. If the trip-count of loops is too small, one does possibly not benefit from thread parallelism (not enough workload for each thread). This might be especially true for nested loops. If you have e.g. the following nested loop,
+```julia
+for i in 1:20
+   for j in 1:30
+      do_somthing_on(i,j)
+   end
+end
+```
+You need to decide which loop to annotate. If you would do on both, 
+```julia
+using Base.Threads
+@threads for i in 1:20
+   @threads for j in 1:30
+      println("Thread $(threadid()) processing i=$i, j=$j")
+   end
+end
+```
+it seems unclear whether we finish in nested threading instead. Julia might still distribute the loop iterations only on the number of threads specified via `-t/--threads` options. But better check.
 
-**Caution!! Pitfalls!!**
+Flattened loops don't work.
+```julia
+using Base.Threads
+@threads for i in 1:20, j in 1:30
+      println("Thread $(threadid()) processing i=$i, j=$j")
+end
+```
+will result in
+```
+ERROR: LoadError: ArgumentError: nested outer loops are not currently supported by @threads
+```
+
+The probably most reasonable way is to merge the loops into one single loop.
+```julia
+@threads for idx in CartesianIndices((1:3, 1:2))
+    i = idx[1]
+    j = idx[2]
+    println("Thread $(threadid()) processing i=$i, j=$j")
+end
+```
+**Again, check whether loop-carried dependencies exist!** That's in nested loops sometimes especially tricky!
+
+#### Issues of Threading, Nested Threading
 
 Threads are not always a safe programming model! Think about *dead-locks* and *data-races*! You are dealing with threads, that's what you may get.
+
+It is possible to spawn and join threads arbitrarily. There's really a lot of freedom and flexibility. But that comes at price. If threads share common data structures, synchronization like *locks* are required in order to prevent data-races. And locks in turn are prone to dead-locks. That's specific to threads! Not to julia.
+
+<br>
 
 Furthermore, packages like [`LinearAlgebra`](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/) (OpenBLAS) and [`MKL`](https://github.com/JuliaLinearAlgebra/MKL.jl) provide own OpenMP thread control. That's somewhat external to julia, i.e. there are no julia threads used. Thread-nesting is not forbidden, but a little dangerous. It requires some care not to over-commit on the given hardware. A sure symptome of such is a vast performance loss (up to even system hang-up).
 Use `BLAS.set_num_threads(1)` to set the required number of threads for the BLAS workflows. 
