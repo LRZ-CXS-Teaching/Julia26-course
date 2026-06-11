@@ -569,6 +569,9 @@ Depending on you workflows, you can send data with function, or "allocate" data 
 
 #### SlurmClusterManager Extension
 
+#### Final Remark
+`Distributed` can be combined with threads. Beware of overcommitment!
+
 
 ### MPI (Message Passing Interface)
 If you have more complicated parallel workflow structures, and possibly a need to work across several computers (be it simply for requirements of more processing units to accelerate the execution, or be it memory requirements per note mitigation for large simulations), the now traditional way is to use the [Message Passing Interface](https://en.wikipedia.org/wiki/Message_Passing_Interface) (MPI).
