@@ -274,7 +274,7 @@ Hint: Repeat the measurements. What happens the first time? Is it faster? If so,
 <details>
 	<summary>Conclusion</summary>
 
-	Maybe better use `LinearAlgebra` for that ... `C = A * B`. ;) (Yes. That's also threaded ... see below.)
+	Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
 </details>
 
 #### Nested Loops
