@@ -481,7 +481,7 @@ Find the main loop, and parallelize it with threads, or with workers. Check the 
 <details>
   <summary>Plot-Result</summary>
 
-This picture was created using
+The following picture was created using
 ```julia
 w, h = 1280, 900
 samples = 1024
