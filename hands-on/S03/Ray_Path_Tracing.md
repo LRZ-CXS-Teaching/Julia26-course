@@ -244,11 +244,22 @@ camera = Camera(position = Vec3(-1.5, 0.0, 0.0))
 
 # Render Image
 image = render_image(camera, shapes, LightSource())
-save("render_result.pdf", image)
+save("render_result.png", image)
 # -------------- Scene Setup and Rendering --------------------
 ```
 <details>
 
+This program is admittedly already a bit more complex. It is supposed to be extended with shapes other then only spheres. Or, material properties can be extended - though the solution for the following path-tracing is imho more appealing.
+
+It requires the modules `Colors` and `Images` to be installed. And then, it can be executed via `julia raytrace.jl`. It produces a PNG file with the result (if everything works well).
+
+Finding the main loop is certainly not that hard. Parallelize it with threads or with workers (or otherwise). Check the scaling! (Does parallelism accelerate?)
+
+<details>
+  <summary>Plot-Result</summary>
+
+
+</details>
 
 ## Path-Tracing
 
