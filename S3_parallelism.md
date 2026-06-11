@@ -449,8 +449,59 @@ and the `BenchmarkTools`.
 
 
 ### Task-Parallelism (Distributed, pmap)
-Next to threading, julia offers another very versatile parallel programming model for CPU systems ... even for multi-systems. The [Distributed](https://github.com/JuliaLang/Distributed.jl) provides support for so-called server-client/master-slave parallelism. Some master controls and distributes workload to other workers. A rather comprehensive documenation can be found here: [Multi-processing and Distributed Computing](https://docs.julialang.org/en/v1/manual/distributed-computing/).
+Next to threading, julia offers another very versatile parallel programming model for CPU systems ... even for multi-systems. The [Distributed](https://github.com/JuliaLang/Distributed.jl) package provides support for so-called server-client/master-slave parallelism. The idea is that some "master" controls and distributes workload to other workers. A rather comprehensive documenation can be found here: [Multi-processing and Distributed Computing](https://docs.julialang.org/en/v1/manual/distributed-computing/).
 
+For one, you can start Julia also with the option `-p/--procs <number>`. It automatically loads the `Distributed` module. Doing so, in the REPL, you then see "workers".
+```julia
+> julia -p 2
+...
+
+julia> nworkers()
+2
+
+julia> workers()
+2-element Vector{Int64}:
+ 2
+ 3
+```
+As for threads, don't get confused that Julia starts indexing workers at 2. Number 1 is the "master".
+
+Supposedly, the workers are like threads and run on different CPUs (Cluster manager usually take care for placement and pinning. Otherwise, under Linux, you can use `taskset`).
+
+You can add workers also internally.
+```julia
+> julia -p 2
+...
+julia> nworkers()
+2
+
+julia> addprocs(3);
+
+julia> nworkers()
+5
+
+julia> for i in workers()
+         rmprocs(i)
+       end
+
+julia> nworkers()
+1
+```
+One always must be preserved. When julia stops, the workers are stopped usually automatically. But it is a good habit to tidy up, nonetheless.
+
+#### Programming Model
+So, what can we do with it? We need to bring workload to the worker, where it runs asynchronously, and get result back later - or wait when it is not present, yet. This concept is know as `furure` (also in other programming languages). How does it look like?
+```julia
+julia> myid()                        # get the worker ID
+1
+
+julia> a = @spawnat 2 myid();        # get the worker ID from the worker
+
+julia> r = fetch(a)                  # when result available, show us
+2
+```
+We executed the function `myid`, which returns the worker ID, on worker 2. The "future" is stored in `a`. Later, we can `fetch` the future's result, and store it in `r`.
+(Careful!! Removing and adding processes/workers might be confusing. The worker IDs once used are never reused. Better avoid this jumble!)
 
 
 
