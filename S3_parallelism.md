@@ -274,7 +274,7 @@ Hint: Repeat the measurements. What happens the first time? Is it faster? If so,
 <details>
 	<summary>Conclusion</summary>
 	Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
-
+	<br>
 	Btw. here a small script how scaling tests could be done. There is unfortunately no way to set the number of threads from inside a julia script.
 	```julia
 	using Plots
