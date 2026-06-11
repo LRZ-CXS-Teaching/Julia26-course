@@ -266,12 +266,13 @@ Finding the main loop is certainly not that hard. Parallelize it with threads or
 
 ## Path-Tracing
 
-Path-tracing almost follows correctly the light path. The nice online-book, [`physical based rendering`](https://www.pbr-book.org/), can teach you much more. Path-tracing (not only for the anit-aliasing, what we had could introduce also for the ray-tracing program) is a Monte-Carlo method. These usually have great potential for parallelism. 
+Path-tracing almost follows correctly the light path. The nice online-book, [`physical based rendering`](https://www.pbr-book.org/), can teach you much more. Path-tracing (not only for the anit-aliasing, what we had could introduce also for the ray-tracing program) is a Monte-Carlo method. These usually have great potential to benefit from parallelism. 
 
 The program is as follows.
 
 <details>
-  <summary></summary>
+  <summary>pathtrace.jl</summary>
+
 ```julia
 using LinearAlgebra
 using Images
@@ -470,10 +471,10 @@ render()
 ```
 </details>
 
-The programm is definitely shorter than the above example. But lacks some finess concerning the user interface. As an illustration it is thus perfect.
+The programm is a bit shorter than the above ray-tracing example. It lacks some finess concerning the user interface (see the comments on e.g. variable restrictions). 
+As an illustration it will but suffice.
 
-It requires the modules `Images` and `ProgressMeter` additionally to be installed (the latter only a nice gimick). And then, it can be executed via `julia pathtrace.jl`. A PNG file with the result is produced.
-The serial program runs for about 10 minutes. 
+It requires the modules `Images` and `ProgressMeter` additionally to be installed (the latter only a nice gimick). And then, it can be executed via `julia pathtrace.jl`. A PNG file with the result is produced. The serial program runs for about 10 minutes. 
 
 Find the main loop, and parallelize it with threads, or with workers. Check the scaling!
 
