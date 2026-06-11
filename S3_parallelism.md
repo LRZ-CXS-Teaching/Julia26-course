@@ -562,7 +562,93 @@ Conclusion: Workers are independent julia instances (processes) that communicate
 Depending on you workflows, you can send data with function, or "allocate" data on the workers (via `@spawnat` or `@everywhere`). There are modules like [`SharedArrays`](https://docs.julialang.org/en/v1/stdlib/SharedArrays/) (on single machine) and [`DistributedArray`](https://juliaparallel.org/DistributedArrays.jl/stable/) (across several machines).
 
 <details>
-	<summary>Kernel Update Example</summary>
+	<summary>Lattice Stencil Update Example</summary>
+
+Here is an example how one could realize a simple stencil update scheme (here, for diffusion equation with diffusion constant `c` in finite difference discretization).
+```julia
+using Distributed
+
+if nworkers() == 1
+    addprocs(4)
+end
+
+@everywhere using DistributedArrays
+
+@everywhere function diffusion_step_1d(u_old::DArray, u_new::DArray, c::Float64)
+    # each worker determines its local index range
+    local_range = localindices(u_old)[1]
+    start_idx = first(local_range)
+    end_idx   = last(local_range)
+    
+    # local arrays for fast computation directly in worker's RAM
+    u_old_local = localpart(u_old)
+    u_new_local = localpart(u_new)
+    
+    # inner range of workers (no communication)
+    for i in 2:(length(local_range) - 1)
+        u_new_local[i] = u_old_local[i] + c * (u_old_local[i-1] - 2*u_old_local[i] + u_old_local[i+1])
+    end
+    
+    # --- update boundary points (ghost cells via communication) ---
+    # left boundary of workers
+    if start_idx > 1
+        # u_old[start_idx - 1] fetches automatically required data from left neighbor worker
+        u_new_local[1] = u_old_local[1] + c * (u_old[start_idx - 1] - 2*u_old_local[1] + u_old_local[2])
+    end
+    
+    # right boundary of workers
+    if end_idx < length(u_old)
+        # u_old[end_idx + 1] fetches automatically required data from right neighbor worker
+        n = length(local_range)
+        u_new_local[n] = u_old_local[n] + c * (u_old_local[n-1] - 2*u_old_local[n] + u_old[end_idx + 1])
+    end
+    
+    # physical boundaries (Dirichlet BC: u fix == 0)
+    if start_idx == 1
+        u_new_local[1] = 0.0
+    end
+    if end_idx == length(u_old)
+        u_new_local[end] = 0.0
+    end
+end
+
+# ---- main program -----
+
+# simulation parameters
+N = 100          # number of lattice points
+steps = 50       # number of time steps
+c = 0.1          # diffusion constant (dt * D / dx^2)
+
+# initialization of distributed arrays (type, dimension, worker-IDs)
+# profile init (e.g. Gauß curve, or a block in the middle)
+u_old = DArray(I -> [ (idx > 40 && idx < 60) ? 1.0 : 0.0 for idx in I[1] ], (N,), workers())
+u_new = dzeros(N)
+
+println("initial state (part): ", Array(u_old)[38:62])
+
+# simulation loop
+for t in 1:steps
+    # execute computation parallel on all assigned workers
+    @sync for p in workers()
+        @async remotecall_fetch(diffusion_step_1d, p, u_old, u_new, c)
+    end
+    
+    # synchronisation: u_new -> u_old of next step (swap)
+    # (As these are DArrays, we copy locally on each worker)
+    @sync for p in workers()
+        @async remotecall_fetch(p) do
+            copyto!(localpart(u_old), localpart(u_new))
+        end
+    end
+end
+
+# fetch result back to master, and show
+u_final = Array(u_old)
+println("final state (part):   ", round.(u_final[38:62], digits=2))
+```
+`@sync` cares for a barrier such that the loop must be finished before any worker can go on. `@async` simply means non-blocking execution of the `remotecall_fetch` on the master in the loops. That's the reason for the outer `@sync`.
+
+The final fetch of an array is debatable in HPC circumstances. Usually, it is more clever to write out results to a file in a worker-local fashion in order to avoid memory overrun on the node of the master.
 </details>
 
 #### Map-Reduce - pmap (jobfarming)
