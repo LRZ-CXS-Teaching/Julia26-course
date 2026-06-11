@@ -252,7 +252,7 @@ save("render_result.png", image)
 This program is admittedly already a bit more complex. It is supposed to be extended with shapes other then only spheres. Or, material properties can be extended - though the solution for the following path-tracing is imho more appealing.
 
 It requires the modules `Colors` and `Images` to be installed. And then, it can be executed via `julia raytrace.jl`. A PNG file with the result is produced (if everything works well).
-And the serial program may run in about 30 seconds. You can change the view port resolution (and reduce the angle resolution accordingly) if you want more workload.
+The serial program may run in about 30 seconds. You can change the view port resolution (and reduce the angle resolution accordingly) if you want more workload.
 
 Finding the main loop is certainly not that hard. Parallelize it with threads or with workers (or otherwise). Check the scaling! (Does parallelism accelerate?)
 
@@ -266,5 +266,229 @@ Finding the main loop is certainly not that hard. Parallelize it with threads or
 
 ## Path-Tracing
 
+Path-tracing almost follows correctly the light path. The nice online-book, [`physical based rendering`](https://www.pbr-book.org/), can teach you much more. Path-tracing (not only for the anit-aliasing, what we had could introduce also for the ray-tracing program) is a Monte-Carlo method. These usually have great potential for parallelism. 
+
+The program is as follows.
+
+<details>
+  <summary></summary>
 ```julia
+using LinearAlgebra
+using Images
+using Random
+using ProgressMeter
+
+const Vec3 = Vector{Float64}
+
+struct Ray
+  origin::Vec3
+  direction::Vec3           # normalized to 1
+end
+
+struct Material
+  albedo::Vec3              # [R,G,B] in [0,1]
+  emission::Vec3            # [R,G,B] > 0
+  roughness::Float64        # in [0,1]
+  metallic::Float64         # in [0,1]
+end
+
+
+struct Sphere
+  center::Vec3
+  radius::Float64           # > 0
+  material::Material
+end
+
+
+function random_in_unit_sphere()
+  while true
+    p = [rand()*2-1, rand()*2-1, rand()*2-1]
+    if dot(p, p) < 1.0 return p end
+  end
+end
+
+function random_in_hemisphere(normal::Vec3)
+  p = normalize(random_in_unit_sphere())
+  return dot(p, normal) > 0.0 ? p : -p
+end
+
+function reflect(v, n)
+  return v - 2.0 * dot(v, n) * n
+end
+
+function schlick_fresnel(cos_theta, f0)
+  return f0 .+ (1.0 .- f0) .* (1.0 - cos_theta)^5
+end
+
+# --- Geometry ---
+function intersect(ray::Ray, s::Sphere)
+  oc = ray.origin - s.center
+  a = dot(ray.direction, ray.direction)
+  b = 2.0 * dot(oc, ray.direction)
+  c = dot(oc, oc) - s.radius^2
+  discriminant = b^2 - 4*a*c
+  if discriminant < 0 return -1.0 end
+  t = (-b - sqrt(discriminant)) / (2.0*a)
+  return t > 0.001 ? t : -1.0
+end
+
+# --- Illumination & Tonemapping ---
+function aces_tonemap(x::Vec3)
+  a, b, c, d, e = 2.51, 0.03, 2.43, 0.59, 0.14
+  @. clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0)
+end
+
+function mix(a, b, t)
+  return a .* (1.0 - t) .+ b .* t
+end
+
+# --- path tracer kernel ---
+function trace_path(ray::Ray, scene, depth::Int, include_emission::Bool=true)
+  if depth <= 0 return [0.0, 0.0, 0.0] end    # maximum iteration reached, return black
+
+  # find closest object intersecting with ray ... if any
+  closest_t = Inf
+  hit_obj = nothing
+  for obj in scene
+    t = intersect(ray, obj)
+    if 0.001 < t < closest_t
+      closest_t = t
+      hit_obj = obj
+    end
+  end
+
+  if hit_obj === nothing 
+    # fancy color gradient background
+    # scale y direction from [-1, 1] to [0, 1]
+    t = 0.5 * (ray.direction[2] + 1.0)
+
+    # color definition (RGB-values in HDR-space)
+    horizon_color = [0.8, 0.9, 1.0]   # light blue at horizon
+    zenith_color    = [0.1, 0.2, 0.5] # dark blue at zenith
+
+    # mix linearly between both colors -> gradient
+    return mix(horizon_color, zenith_color, t)
+  end 
+
+
+  hit_point = ray.origin + ray.direction * closest_t
+  normal = normalize(hit_point - hit_obj.center)
+  mat = hit_obj.material
+  
+  # 1. emission (directly seen)
+  result = include_emission ? mat.emission : [0.0, 0.0, 0.0]
+
+  # 2. next event estimation (NEE; direct light)
+  for obj in scene
+    if sum(obj.material.emission) > 0 && obj !== hit_obj
+      # sample point on light source (simplified: center)
+      light_dir_full = obj.center - hit_point
+      light_dist = norm(light_dir_full)
+      light_dir = light_dir_full / light_dist
+      
+      # check shadows
+      shadow_ray = Ray(hit_point, light_dir)
+      in_shadow = false
+      for s_obj in scene
+          st = intersect(shadow_ray, s_obj)
+          if 0.001 < st < light_dist - 0.001
+              in_shadow = true; break
+          end
+      end
+
+      if !in_shadow
+          cos_l = max(0.0, dot(normal, light_dir))
+          # diffusive fraction for light sources
+          result += (mat.albedo ./ pi) .* obj.material.emission .* cos_l
+      end
+    end
+  end
+
+  # 3. indirect light (mirror vs. diffusiv)
+  f0 = mix([0.04, 0.04, 0.04], mat.albedo, mat.metallic)
+  f = schlick_fresnel(max(0.0, dot(-ray.direction, normal)), f0)
+  
+  if rand() < max(f...) # probability to mirror
+    spec_dir = normalize(reflect(ray.direction, normal) + mat.roughness * random_in_unit_sphere())
+    incoming = trace_path(Ray(hit_point, spec_dir), scene, depth - 1, true)  
+    incoming_clamped = clamp.(incoming, 0.0, 20.0)    # catching fireflies
+
+    result += f .* incoming_clamped
+  else
+    # diffusiv (unless fully metallic)
+    if mat.metallic < 1.0
+      diff_dir = random_in_hemisphere(normal)
+      kd = (1.0 .- f) .* (1.0 - mat.metallic)
+      indirect = trace_path(Ray(hit_point, diff_dir), scene, depth - 1, false)
+      result += (mat.albedo .* indirect .* kd) # PDF & Lambert cut out each other in part in uniform sampling
+    end
+  end
+
+  return result
+end
+
+# --- szene & rendering ---
+function render()
+  w, h = 1024, 720                     # window width and height (400,300 for small test)
+  samples = 200                        # samples per pixel; higher for better quality (less noise) (50 for small test)
+  exposure = 1.5                       # lighter image > 1
+  depth = 5                            # number of bounces (5 for small test)
+  scale = 0.73                         # zoom factor
+  img = zeros(RGB{Float64}, h, w)      # pixel map
+
+  scene = [
+    Sphere([0,0,-1.0e6], 1.0e6-3.3, Material([0.5, 0.5, 0.5], [0,0,0], 0.1, 0.0)),       # ground
+    Sphere([7., -1., -1.], 1.0, Material([0.03, 1.0, 0.03], [0,0,0], 0.7, 0.6)),         # green
+    Sphere([10.,0.,0.], 3.0, Material([1.0, 0.03, 0.03], [0,0,0], 0.7, 0.6)),            # red
+    Sphere([5.,1.,1.],1.0, Material([0.03, 0.03, 1.0], [0,0,0], 0., 0.9)),               # blue
+    Sphere([7.5, -2.7,  2.0], 0.7, Material([0.784, 0.784, 0.608], [0,0,0], 0.1, 0.7)),  # beige
+    Sphere([8.5, -3.5,  0.0], 1.5, Material([1.0, 0.03, 1.0], [0,0,0], 0.3, 0.6)),       # magenta
+    Sphere([-2., -10., 10.], 1., Material([0,0,0], [150, 150, 150], 0, 0))               # light source rear
+  ]
+
+  @showprogress for x in 1:w
+    for y in 1:h
+      col = [0.0, 0.0, 0.0]
+      for s in 1:samples
+        u = -((x + rand() - w/2) / h ) * scale            # x pixel position
+        v = -((y + rand() - h/2) / h ) * scale            # y pixel position
+        ray = Ray([-1.5, 0, 0], normalize([1, u, v]))     # camera assumed at [-1.5,0,0] pointing to [1, 0, 0]
+        col += trace_path(ray, scene, depth)              # update color values (arithmetic mean)
+      end
+      
+      # post-processing
+      col /= samples                                      # devide by sample size (arithmetic mean)
+      hdr_col = col .* exposure                           # light up
+      final_col = aces_tonemap(hdr_col) .^ (1.0 / 2.2)    # tone-map (human perception) and gamma correction
+      img[y, x] = RGB(final_col...)                       # assign to final pixel matrix
+    end
+  end
+  save("path_traced_scene.png", img)
+end
+
+render()
 ```
+</details>
+
+The programm is definitely shorter than the above example. But lacks some finess concerning the user interface. As an illustration it is thus perfect.
+
+It requires the modules `Images` and `ProgressMeter` additionally to be installed (the latter only a nice gimick). And then, it can be executed via `julia pathtrace.jl`. A PNG file with the result is produced.
+The serial program runs for about 10 minutes. 
+
+Find the main loop, and parallelize it with threads, or with workers. Check the scaling!
+
+<details>
+  <summary>Plot-Result</summary>
+
+This picture was created using
+```julia
+w, h = 1280, 900
+samples = 1024
+depth = 12
+```
+This takes really long. With 80 threads, it took about an half an hour on a 80 core Intel Icelake processor.
+
+<div align="center">
+  <img src="../../miscellanea/images/path_traced_scene.png" width="800" alt="ray tracing result">
+</div>
+</details>
