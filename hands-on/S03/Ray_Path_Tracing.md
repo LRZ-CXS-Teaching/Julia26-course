@@ -251,14 +251,17 @@ save("render_result.png", image)
 
 This program is admittedly already a bit more complex. It is supposed to be extended with shapes other then only spheres. Or, material properties can be extended - though the solution for the following path-tracing is imho more appealing.
 
-It requires the modules `Colors` and `Images` to be installed. And then, it can be executed via `julia raytrace.jl`. It produces a PNG file with the result (if everything works well).
+It requires the modules `Colors` and `Images` to be installed. And then, it can be executed via `julia raytrace.jl`. A PNG file with the result is produced (if everything works well).
+And the serial program may run in about 30 seconds. You can change the view port resolution (and reduce the angle resolution accordingly) if you want more workload.
 
 Finding the main loop is certainly not that hard. Parallelize it with threads or with workers (or otherwise). Check the scaling! (Does parallelism accelerate?)
 
 <details>
   <summary>Plot-Result</summary>
 
-
+<div align="center">
+  <img src="../../miscellanea/images/render_result.png" width="800" alt="ray tracing result">
+</div>
 </details>
 
 ## Path-Tracing
