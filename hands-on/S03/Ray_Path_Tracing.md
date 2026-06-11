@@ -12,6 +12,7 @@ The program is as follows.
 
 <details>
   <summary>raytrace.jl</summary>
+
 ```julia
 using Colors, Images
 
