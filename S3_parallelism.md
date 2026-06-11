@@ -93,6 +93,18 @@ julia> @code_native C = A .+ B
 ```
 This example is of course not very useful here. The element-wise addition of two arrays is already memory-bandwidth bound. One doesn't gain here much through vectorization, as the CPU mostly waits for the data from the memory/caches. The compiler here vectorizes only to ymm-registers (AVX2) instead of zmm-registers (AVX512), as it "knows" that. And vectorization comprises also some overhead which is larger for wider vector-registers.
 
+However, some small thing might still enhance it. In `C = A .+ B`, the memory for `C` needs to be allocated before! This takes a little bit of time extra. If `C` already existed before (`C = similar(A)`), you should use
+```julia
+C .= A .+ B
+```
+or, for better readability,
+```julia
+@. C = A + B
+# or, even
+@inbounds @. C = A + B;
+```
+Julia understands this automatically to attach the dot on every operation (*broadcast fusion*). If `C` doesn't exist in memory before, you will get an error.
+
 Conclusion: We can mostly rely on LLVM here to give us a good-compromize performance. If not, work gets harder to figure out why loops aren't vectorized, and to make the compiler to rethink its decision. There are macros like `@simd`, and packages like [`SIMD`](https://github.com/eschnett/SIMD.jl) and [`LoopVectorization`](https://github.com/JuliaSIMD/LoopVectorization.jl) (`@turbo`). But eventually, one needs to really look into the compiled code to see whether vectorization was done. At the end, the compiler decides (similar as for inlining - `@inline`).
 
 For instance,
@@ -222,8 +234,45 @@ Use `threadinfo()` to check correctness placement and pinning.
 
 The combination of SIMD and threads is a bit more cumbersome. The simplest way is maybe again via [`LoopVectorization`](https://github.com/JuliaSIMD/LoopVectorization.jl), and the `@tturbo` macro,
 ```julia
-WEITER HIER
+using LoopVectorization
+
+# serial loop
+function matmul_serial!(C, A, B)
+    # Important (remember): loop sequence i, k, j is in Julia (column-based) optimum
+    C .= 0.0
+    for j in axes(B, 2), k in axes(A, 2), i in axes(A, 1)
+        @inbounds C[i, j] += A[i, k] * B[k, j]
+    end
+end
+
+# SIMD and threaded loop (with @tturbo)
+function matmul_tturbo!(C, A, B)
+    @tturbo for j in axes(B, 2), i in axes(A, 1)
+        Cij = 0.0
+        for k in axes(A, 2)
+            Cij += A[i, k] * B[k, j]
+        end
+        C[i, j] = Cij
+    end
+end
 ```
+**Inline Task:** Please, benchmark the both functions with the matrixes:
+```julia
+A = rand(1000,1000);
+B = rand(1000,1000);
+C = similar(A);
+
+@time matmul_serial!(C, A, B)
+
+@time matmul_tturbo!(C, A, B)
+```
+and with 4 julia threads (`julia -t 4`).
+
+What do you observe?
+
+Hint: Repeat the measurements. What happens the first time? Is it faster? If so, how much faster?
+
+Conclusion: Maybe better use `LinearAlgebra` for that ... `C = A * B`. ;) (Yes. That's also threaded ... see below.)
 
 #### Nested Loops
 
