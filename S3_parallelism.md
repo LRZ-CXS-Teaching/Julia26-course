@@ -194,9 +194,9 @@ Using compact dot-notation very often helps, if applicable.
 
 
 ### Threads
-[`Threads`](https://docs.julialang.org/en/v1/manual/multi-threading/) are in Julia already included into the `Base` package.
+[`Threads`](https://docs.julialang.org/en/v1/manual/multi-threading/) are already included into the `Base` package in Julia.
 
-Using threading is rather simple.
+Using threading is rather direct. Here a `for`-loop example.
 ```shell
 > julia --threads 4 -e 'println(Threads.nthreads())'
 4
@@ -212,11 +212,10 @@ Using threading is rather simple.
 4
 4
 ```
-**So, usage is simple! Annotate the for-loops. Only go sure that there are no loop-carried dependencies!!**
+**So, usage is simple in this case! Annotate the for-loops. Only go sure that there are no loop-carried dependencies!!**
 A simple way to check that is to reserse the order of loop iterations, and checking whether the result is still the same.
 
 Instead of `--threads`, also `-t` can be used. Thread IDs don't start with 1 (kept for the main julia process)!
-
 
 
 #### HPC related Issues
