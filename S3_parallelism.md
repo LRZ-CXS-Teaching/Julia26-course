@@ -356,6 +356,9 @@ plot(p1, p2, layout = (1, 2), size = (800, 400))
 
 savefig("scaling_plot.pdf")
 ```
+
+A result may look as follows.
+
 </details>
 
 Conclusion: Maybe better use "LinearAlgebra" for that ... "C = A * B". ;) (Yes. That's also threaded ... see below.)
