@@ -487,7 +487,7 @@ w, h = 1280, 900
 samples = 1024
 depth = 12
 ```
-This takes really long. With 80 threads, it took about an half an hour on a 80 core Intel Icelake processor.
+This takes really long. With 80 threads, it took about half an hour on a 80 core Intel Icelake processor.
 
 <div align="center">
   <img src="../../miscellanea/images/path_traced_scene.png" width="800" alt="ray tracing result">
