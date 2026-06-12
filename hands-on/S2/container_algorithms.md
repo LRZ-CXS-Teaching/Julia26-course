@@ -106,4 +106,23 @@ Do the following operations:
 9. Find the three youngest characters! (Without sorting the whole list!)
 10. Create a new column, where for each character a "status" is determined of being "dead" or "alive", depending on `age <= 50` (alive)!
 
+## Tutorial: Plotting of CSV Data
+More often than not, CSV data stem from logs or so, and contain date-time data. Here, a simple example how to measure the laptop's temperature over a period of time.
+```shell
+> echo "Timestamp,Temperature_C" > cpu_temp.csv; while true; do echo "$(date -Iseconds),$(cat /sys/class/thermal/thermal_zone0/temp | awk '{print $1/1000}')" | tee -a cpu_temp.csv; sleep 1; done
+```
+You can download it [here](cpu_temp.csv).
 
+Let's say, we want to plot them. No problem.
+```julia
+julia> using DataFrames, Dates, CSV, Plots
+julia> df = CSV.read("cpu_temp.csv", DataFrame; dateformat="yyyy-mm-ddTHH:MM:SS+02:00")
+julia> plot(df.Timestamp, df.Temperature_C)
+```
+The result looks as follows.
+
+<div align="center">
+  <img src="cpu_temp.png" width="600" alt="temperature trace">
+</div>
+
+Still a bit ugly. In the next exercise, you can learn more about plotting.
