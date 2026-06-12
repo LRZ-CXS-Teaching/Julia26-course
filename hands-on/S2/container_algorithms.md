@@ -122,7 +122,7 @@ julia> plot(df.Timestamp, df.Temperature_C)
 The result looks as follows.
 
 <div align="center">
-  <img src="cpu_temp.png" width="600" alt="temperature trace">
+  <img src="cpu_temp.png" width="400" alt="temperature trace">
 </div>
 
 Still a bit ugly. In the next exercise, you can learn more about plotting.
