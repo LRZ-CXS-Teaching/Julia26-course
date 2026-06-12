@@ -136,7 +136,123 @@ In many cases, with this little information extra, compilers really can do some 
 
 
 ### Struct of Arrays Pattern
-The next section ["Parallelism"](S3_parallelism.md)
+Often, it's preferred to create a stucture like the following for convenience (we think in such structures).
+```julia
+struct Particle3D
+    x::Float64
+    y::Float64
+    z::Float64
+end
+```
+And as there are many of such particles, one needs a collection.
+```julia
+const N = 10_000_000
+data = [Particle3D(rand(), rand(), rand()) for _ in 1:N]
+```
+In a MD simulation, one maybe needs to calculate the compute the respective distances. For simplicity of illustration, let's "only" determine the center-of-gravity (CoG) of the particle cloud.
+```julia
+function compute_center_of_gravity(particles)
+    x², y², z² = (0, 0, 0)
+    for i in eachindex(particles)
+        @inbounds p = particles[i]     # no boundary checks
+        x² += p.x^2
+        y² += p.y^2
+        z² += p.z^2
+    end
+    x = √(x²/length(particles))
+    y = √(y²/length(particles))
+    z = √(z²/length(particles))
+    return [x,y,z]
+end
+
+a = compute_center_of_gravity(data)
+```
+Well, there is really nothing wrong. But only a bit inefficient for computers. In the next section, ["Parallelism-related Topics and Patterns"](S3_parallelism.md), we will explain a little more about this problem as it is related to memory access patterns of computers, and *cache lines* - the CPUs implicit parallelism.
+
+Benchmarking of this gives (Intel Icelake).
+```
+--- Performance AoS (Standard Array) ---
+  24.584 ms (2 allocations: 80 bytes)
+```
+
+Here, in short: Computers are better in accessing contiguous pieces of memory. And `data` has data in memory according to the pattern `data = [x1, y1, z1, x2, y2, z2, ...]`, which is a less optimal for this loop computation.
+
+Certainly, letting `Particle3D` have three arrays, `x, y, z`, with the pattern, `x = [x_1, x2, ...], y = [y_1, y_2, ...], ...` would be better from computer's point of view. But implementing that from a user's perspective is maybe not so convenient. And it's not so easy to get it right.
+```julia
+struct ParticlePositions{A<:AbstractVector{Float64}}
+  x::A
+  y::A
+  z::A
+end
+
+x_coords = rand(Float64, N)
+y_coords = rand(Float64, N)
+z_coords = rand(Float64, N)
+
+soa_particles = ParticlePositions(x_coords, y_coords, z_coords)
+
+function compute_center_of_gravity_soa(particles)
+    return [√sum(particles.x.^2), √sum(particles.y.^2), √sum(particles.z.^2)] ./ length(particles.x)
+end
+```
+First of all, we need another extra function to calculate the CoG. Second, it is way slower!! The benchmarking results in
+```
+--- Performance SoA (StructArray) ---
+  78.799 ms (13 allocations: 228.89 MiB)
+```
+where immediately is clear what the issue is ... memory allocation for temporary arrays.
+
+Ok. The function looks way shorter. Very compact. But what does it help?!
+
+<br>
+
+Let's look then what Julia already offers: `StructArrays`.
+```julia
+using StructArrays
+using BenchmarkTools
+
+struct Particle3D
+    x::Float64
+    y::Float64
+    z::Float64
+end
+
+const N = 10_000_000
+
+aos_data = [Particle3D(rand(), rand(), rand()) for _ in 1:N]
+soa_data = StructArray(aos_data)                                     # makes a deep copy of aos_data!
+
+function compute_center_of_gravity!(particles)                       # same function for AoS and SoA
+    x², y², z² = (0, 0, 0)
+    for i in eachindex(particles)
+        @inbounds p = particles[i]                                   # no boundary checks
+        x² += p.x^2
+        y² += p.y^2
+        z² += p.z^2
+    end
+    x = √(x²/length(particles))
+    y = √(y²/length(particles))
+    z = √(z²/length(particles))
+    return [x,y,z]
+end
+
+println("--- Performance AoS (Standard Array) ---")
+@btime compute_center_of_gravity!($aos_data);
+
+println("\n--- Performance SoA (StructArray) ---")
+@btime compute_center_of_gravity!($soa_data);
+```
+The result is
+```
+--- Performance AoS (Standard Array) ---
+  24.938 ms (2 allocations: 80 bytes)
+
+--- Performance SoA (StructArray) ---
+  19.511 ms (2 allocations: 80 bytes)
+```
+A speed-up of 1.28 (speed-up = reference-execution-time / other-execution-time ; see next section).
+
+There is still a tradeoff. `soa_data = StructArray(aos_data)` copies the AoS data into a new data structure. This means memory allocation! If one can dispense with the AoS data, and work only with the SoA data then, one can execute `aos_data = nothing; GC.gc()` in order to let the garbage collector remove the AoS data from memory. Also this requires some time!
 
 ### Memoization Pattern (idea)
 
