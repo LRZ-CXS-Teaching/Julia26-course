@@ -1,6 +1,6 @@
 # Data Handling (Containers/Data Frames/Algorithms)
 
-## A Person Database to play with
+## A Character Database to play with
 
 Assume, you have some csv file (aka "Excel sheet"), `got.csv`, and you have to do some tasks on it. Sure, you could open Excel ... if you have (or, Libreoffice Calc).
 
@@ -74,5 +74,36 @@ julia> eltype.(eachcol(df))
 
 `String31` means a string auto-type of DataFrames, containing up to 31 characters. Users don't need to do anything here. It's an optimization. You can consider them all a `String`.
 
+DataFrames are 2D arrays-
+```julia
+julia> println(df[1,1])                                                # first column, first row
+Eddard
+
+julia> println(df[1,:])                                                # first row
+DataFrameRow
+ Row │ name      surname   age    gender   title              
+     │ String15  String15  Int64  String7  String31           
+─────┼────────────────────────────────────────────────────────
+   1 │ Eddard    Stark        60  male     Lord of Winterfell
+
+julia> println(df[:,1])                                                # first column
+String15["Eddard", "Robert", "Jaime", "Cersei", "Daenerys", "Jon", "Sansa", "Arya", "Bran", "Joffrey", "Tyrion", "Catelyn", "Jorah", "Sandor", "Samwell"]
+```
+You can even change the entries if wanted (`df[1,1] = "Somebody-else"`), and store the result back into a file (`CSV.write("output.csv",df)`).
+
+## Exercise
+You have some helper functions at hand: `filter`, `sort`, `transform`, `map`, `shuffle` (from `Random`), `sum`, ... and many more. (Google for what you need in case!)
+
+Do the following operations:
+1. Find all characters with surname `Stark`!
+2. Find all characters younger or as old as 30 years!
+3. Find all characters with a first name that starts with letter `J` till `P`!
+4. Sort the data by surname!
+5. Sort the data by surname, where also the first names are sorted!
+6. Find all characters younger than 30, sorted by surname!
+7. Find the youngest character!
+8. Find the 3rd-oldest character!
+9. Find the three youngest characters! (Without sorting the whole list!)
+10. Create a new column, where for each character a "status" is determined of being "dead" or "alive", depending on `age $\le$ 50` (alive)!
 
 
