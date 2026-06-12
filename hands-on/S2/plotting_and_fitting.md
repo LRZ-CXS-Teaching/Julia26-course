@@ -66,9 +66,22 @@ heatmap(-2:0.001:1,-1:0.001:1,(x,y)->(c=x+y*im; z=0+0im; for i in 1:100 z = z^2 
 Zoom into some region of the set, and admire the structure.
 
 ### Julia Sets
+Julia sets are quite similar. The difference is that $c$ is fix ... say $c=-0.8+0.156i$ (you can play with the value). But $z_0$ is now the point from the complex plane (the role, $c$ has in the Mandelbrot set). The rest is exactly the same.
 
 #### Exercise
 Create a plot of a Julia set. Zoom into details. Admire.
+
+<details>
+  <summary>Solution. (Don't cheat! Please try yourself first! It's easy!)</summary>
+```julia
+heatmap(-1.6:0.001:1.6,-1:0.001:1,(x,y)->(c=-0.8+0.156im; z=complex(x,y); for i in 1:100 z = z^2 + c; abs(z) > 2 && return i/100; end; 0), c=:haline, size=(1400,900))
+```
+
+<div align="center">
+  <img src="juliaset.png" width="800" alt="Julia set">
+</div>
+</details>
+
 
 ## Curve Fitting
 
