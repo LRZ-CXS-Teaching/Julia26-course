@@ -42,10 +42,11 @@ And much more ...
 ## Mandelbrot / Julia Sets
 
 ### Mandelbrot Sets
-Mandelbrot sets can be created as follows. Take a point $z_0=c$ in the complex plane as a start point for the following iteration.
+Mandelbrot sets can be created as follows. Take a point $c$ in the complex plane for the following iteration.
 ```math
-z_{i+1} = z_i^2 + c\;,\qquad i = 0, 1, 2, ...
+z_{i+1} = z_i^2 + c\;,\qquad i = 0, 1, 2, \ldots\;,\qquad z_0=0\;.
 ```
+For some values of $c$, this iteration diverges, i.e. $|z_n|\rightarrow\infty$. For others, $|z_n|<\infty$. 
 
 ```julia
 heatmap(-2:0.001:1,-1:0.001:1,(x,y)->(c=x+y*im; z=0+0im; for i in 1:100 z = z^2 + c; abs(z) > 2 && return i/100 end; 0), c = :magma, size=(1400,900), xl="real part", yl="imaginary part")
