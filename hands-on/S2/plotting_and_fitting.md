@@ -42,6 +42,10 @@ And much more ...
 ## Mandelbrot / Julia Sets
 
 ### Mandelbrot Sets
+Mandelbrot sets can be created as follows. Take a point $z_0=c$ in the complex plane as a start point for the following iteration.
+```math
+z_i = z_{i-1}^2 + c\;,\qquad i = 1, 2, ...
+```
 
 ```julia
 heatmap(-2:0.001:1,-1:0.001:1,(x,y)->(c=x+y*im; z=0+0im; for i in 1:100 z = z^2 + c; abs(z) > 2 && return i/100 end; 0), c = :magma, size=(1400,900), xl="real part", yl="imaginary part")
@@ -54,8 +58,13 @@ heatmap(-2:0.001:1,-1:0.001:1,(x,y)->(c=x+y*im; z=0+0im; for i in 1:100 z = z^2 
 </div>
 </details>
 
+#### Exercise
+Zoom into some region of the set, and admire the structure.
+
 ### Julia Sets
 
+#### Exercise
+Create a plot of a Julia set. Zoom into details. Admire.
 
 ## Curve Fitting
 
