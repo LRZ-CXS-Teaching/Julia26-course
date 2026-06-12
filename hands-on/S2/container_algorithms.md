@@ -104,6 +104,6 @@ Do the following operations:
 7. Find the youngest character!
 8. Find the 3rd-oldest character!
 9. Find the three youngest characters! (Without sorting the whole list!)
-10. Create a new column, where for each character a "status" is determined of being "dead" or "alive", depending on `age $\le$ 50` (alive)!
+10. Create a new column, where for each character a "status" is determined of being "dead" or "alive", depending on `age <= 50` (alive)!
 
 
