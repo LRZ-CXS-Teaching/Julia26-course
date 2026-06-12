@@ -44,11 +44,11 @@ And much more ...
 ### Mandelbrot Sets
 Mandelbrot sets can be created as follows. Take a point $c$ in the complex plane for the following iteration.
 ```math
-z_{i+1} = z_i^2 + c\;,\qquad i = 0, 1, 2, \ldots\;,\qquad z_0=0\;.
+z_i = z_{i-1}^2 + c\;,\qquad i = 1, 2, \ldots\;,\qquad z_0=0\;.
 ```
-For some values of $c$, this iteration diverges, i.e. $|z_n|\rightarrow\infty$. For others, $|z_n|<\infty$ (it does not converge but follows some cycle). If somewhen $|z_n|>2$, the chance is high that the sequence diverges. Afaik, there is no exact limit known. Or, it cannot be predicted which $n$ this threshold is exceeded, or so.
+For some values of $c$, this iteration diverges, i.e. $|z_i|\rightarrow\infty$. For others, $|z_i|<\infty$ (it does not converge but follows some cycle, the magnitudes of which are limited). If somewhen $|z_i|>2$, the chance is high that the sequence diverges. Afaik, there is no exact limit known. Or, it cannot be predicted which $i$ this threshold is exceeded, or so.
 
-It doesn't matter. We simply do the following. For each $c$, we iterate the sequence $z_n$ from 0 to 100. If all $|z_n|\le2$, we assume convergence. Otherwise, divergence. And for coloring, we pick the index $n$ for which $|z_n|>2$ (divided by 100, to get a number in $[0,1]$).
+It doesn't matter. We simply do the following. For each $c$, we iterate the sequence $z_i$ for $i$ from 1 to 100. If all $|z_i|\le2$, we assume convergence. Otherwise, divergence. And for coloring, we pick the index $i$ for which $|z_i|>2$ (divided by 100, to get a number in $[0,1]$).
 
 It is maybe fun to see that in Julia, we can do that in a single code line.
 ```julia
