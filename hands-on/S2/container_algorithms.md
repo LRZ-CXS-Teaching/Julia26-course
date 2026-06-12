@@ -111,7 +111,7 @@ More often than not, CSV data stem from logs or so, and contain date-time data. 
 ```shell
 > echo "Timestamp,Temperature_C" > cpu_temp.csv; while true; do echo "$(date -Iseconds),$(cat /sys/class/thermal/thermal_zone0/temp | awk '{print $1/1000}')" | tee -a cpu_temp.csv; sleep 1; done
 ```
-You can download it [here](cpu_temp.csv).
+(Ctrl+C to interrupt) You can download it [here](cpu_temp.csv).
 
 Let's say, we want to plot them. No problem.
 ```julia
