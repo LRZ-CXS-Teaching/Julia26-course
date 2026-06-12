@@ -280,13 +280,23 @@ That's better.
 Semantic: [Memoization pattern](https://en.wikipedia.org/wiki/Memoization) means to cache results that where already computed, in order to avoid re-computation. That's the trick. For possible implementation details, see e.g. the book of Kwong. 
 
 ### Barrier Function Pattern (type-unstable functions)
-Let's look at the following function (example taken from Kwong).
+Let's look at the following function (example is taken from Kwong).
 ```julia
 random_data(n) = isodd(n) ? rand(Int, n) : rand(Float64, n)
 ```
-Yes! This works in julia! Types are first citizens in Julia (`a = rand(Float64,10); a_type = typeof(a); if a_type <: AbstractArray{Float64, 1} do_this() else do_that() end`).
+Yes! This works in julia! Types are first citizens in Julia. try that
+```julia
+a = rand(Float64,10)
+a_type = typeof(a)
+if a_type <: AbstractArray{Float64, 1}
+   println("AbstractArray{Float64, 1}")                 # synonme for some real code that executes
+else
+   println("not a AbstractArray{Float64, 1}")
+end
+```
+([RTTI](https://en.wikipedia.org/wiki/Run-time_type_information) in C++ is way more complicated.)
 
-Let's write another function, which uses `random_data(n)`.
+Moving right along. Let's write another function, which uses `random_data(n)`.
 ```julia
 function double_sum_of_random_data(n)
     data = random_data(n)
@@ -300,10 +310,10 @@ end
 Let's benchmark it.
 ```julia
 julia> @btime double_sum_of_random_data(100000);
-  430.250 μs (3 allocations: 781.32 KiB)
+  430.250 μs (3 allocations: 781.32 KiB)                                         # Please remember!
 
 julia> @btime double_sum_of_random_data(100001);
-  75.269 μs (3 allocations: 781.38 KiB)
+  75.269 μs (3 allocations: 781.38 KiB)                                          # Please remember!
 
 julia> @code_warntype  double_sum_of_random_data(100000)
 MethodInstance for double_sum_of_random_data(::Int64)
@@ -312,7 +322,7 @@ Arguments
   #self#::Core.Const(Main.double_sum_of_random_data)
   n::Int64
 Locals
-  @_3::Union{Nothing, Tuple{Float64, Int64}, Tuple{Int64, Int64}}
+  @_3::Union{Nothing, Tuple{Float64, Int64}, Tuple{Int64, Int64}}                # Here are everywhere Unions!!
   total::Union{Float64, Int64}
   data::Union{Vector{Float64}, Vector{Int64}}
   v::Union{Float64, Int64}
@@ -320,7 +330,7 @@ Body::Union{Float64, Int64}
 1 ─ %1  = Main.random_data::Core.Const(Main.random_data)
 │         (data = (%1)(n))
 │         (total = 0)
-│   %4  = data::Union{Vector{Float64}, Vector{Int64}}
+│   %4  = data::Union{Vector{Float64}, Vector{Int64}}                             # Type unkown at compile time!
 │         (@_3 = Base.iterate(%4))
 │   %6  = @_3::Union{Nothing, Tuple{Float64, Int64}, Tuple{Int64, Int64}}
 │   %7  = (%6 === nothing)::Bool
@@ -345,9 +355,9 @@ Body::Union{Float64, Int64}
 └──       return %25
 ```
 Julia needs to incorporate completely that different types can occur during runtime - depending on the input value function. And that for the full summation loop, too!
-This prevents the comnpiler from extra optimization.
+This prevents the JIT compiler from extra optimization.
 
-The "*barrier function pattern*" is meant to cope with this issue. Let's look how it works.
+The "*barrier function pattern*" (Kwong calls it so) is meant to cope with this issue. Let's look how it works.
 ```julia
 function double_sum(data)
     total = 0
