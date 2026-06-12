@@ -279,7 +279,106 @@ That's better.
 
 Semantic: [Memoization pattern](https://en.wikipedia.org/wiki/Memoization) means to cache results that where already computed, in order to avoid re-computation. That's the trick. For possible implementation details, see e.g. the book of Kwong. 
 
-### Barrier Function Pattern (type-unstable functions) ?
+### Barrier Function Pattern (type-unstable functions)
+Let's look at the following function (example taken from Kwong).
+```julia
+random_data(n) = isodd(n) ? rand(Int, n) : rand(Float64, n)
+```
+Yes! This works in julia! Types are first citizens in Julia (`a = rand(Float64,10); a_type = typeof(a); if a_type <: AbstractArray{Float64, 1} do_this() else do_that() end`).
+
+Let's write another function, which uses `random_data(n)`.
+```julia
+function double_sum_of_random_data(n)
+    data = random_data(n)
+    total = 0
+    for v in data
+       total += 2 * v
+    end
+    return total
+end
+```
+Let's benchmark it.
+```julia
+julia> @btime double_sum_of_random_data(100000);
+  430.250 μs (3 allocations: 781.32 KiB)
+
+julia> @btime double_sum_of_random_data(100001);
+  75.269 μs (3 allocations: 781.38 KiB)
+
+julia> @code_warntype  double_sum_of_random_data(100000)
+MethodInstance for double_sum_of_random_data(::Int64)
+  from double_sum_of_random_data(n) @ Main REPL[2]:1
+Arguments
+  #self#::Core.Const(Main.double_sum_of_random_data)
+  n::Int64
+Locals
+  @_3::Union{Nothing, Tuple{Float64, Int64}, Tuple{Int64, Int64}}
+  total::Union{Float64, Int64}
+  data::Union{Vector{Float64}, Vector{Int64}}
+  v::Union{Float64, Int64}
+Body::Union{Float64, Int64}
+1 ─ %1  = Main.random_data::Core.Const(Main.random_data)
+│         (data = (%1)(n))
+│         (total = 0)
+│   %4  = data::Union{Vector{Float64}, Vector{Int64}}
+│         (@_3 = Base.iterate(%4))
+│   %6  = @_3::Union{Nothing, Tuple{Float64, Int64}, Tuple{Int64, Int64}}
+│   %7  = (%6 === nothing)::Bool
+│   %8  = Base.not_int(%7)::Bool
+└──       goto #4 if not %8
+2 ┄ %10 = @_3::Union{Tuple{Float64, Int64}, Tuple{Int64, Int64}}
+│         (v = Core.getfield(%10, 1))
+│   %12 = Core.getfield(%10, 2)::Int64
+│   %13 = Main.:+::Core.Const(+)
+│   %14 = total::Union{Float64, Int64}
+│   %15 = Main.:*::Core.Const(*)
+│   %16 = v::Union{Float64, Int64}
+│   %17 = (%15)(2, %16)::Union{Float64, Int64}
+│         (total = (%13)(%14, %17))
+│         (@_3 = Base.iterate(%4, %12))
+│   %20 = @_3::Union{Nothing, Tuple{Float64, Int64}, Tuple{Int64, Int64}}
+│   %21 = (%20 === nothing)::Bool
+│   %22 = Base.not_int(%21)::Bool
+└──       goto #4 if not %22
+3 ─       goto #2
+4 ┄ %25 = total::Union{Float64, Int64}
+└──       return %25
+```
+Julia needs to incorporate completely that different types can occur during runtime - depending on the input value function. And that for the full summation loop, too!
+This prevents the comnpiler from extra optimization.
+
+The "*barrier function pattern*" is meant to cope with this issue. Let's look how it works.
+```julia
+function double_sum(data)
+    total = 0
+    for v in data
+        total += 2 * v
+    end
+    return total
+end
+```
+And we need to rewrite the `double_sum_of_random_data` function.
+```julia
+function double_sum_of_random_data(n)
+    data = random_data(n)
+    return double_sum(data)
+end
+```
+Let's benchmark again.
+```julia
+julia> @btime double_sum_of_random_data(100000)
+  212.368 μs (3 allocations: 781.32 KiB)
+
+julia> @btime double_sum_of_random_data(100001)
+  45.616 μs (3 allocations: 781.38 KiB)
+```
+Not bad! A factor of 2 speed-up!
+
+What is the clue here? Julia can compile `double_sum` function for each type (`Int64`, `Float64`) seperately. As there is no chance then to change the type anymore internally, it can apply all kinds of optimizations for the respective functions. Julia's multiple dispatch capability then does the rest.
+
+Conclusion: Multiple dispatch is not only a means flexibility, but is an important means for optimization.
+This can also be exploited to avoid ugly (and often inefficient) `if` conditions (`if type == Int64 do_this() else do_that() end`).
+
 
 ### Inlining
 Function call have slight overhead (despite the statement about "first citizens" in julia). You can try to avoid by inlining functions in julia, where it makes sense, using the `@inline` macro. For instance,
