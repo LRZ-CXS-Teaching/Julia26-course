@@ -357,7 +357,7 @@ Body::Union{Float64, Int64}
 Julia needs to incorporate completely that different types can occur during runtime - depending on the input value function. And that for the full summation loop, too!
 This prevents the JIT compiler from extra optimization.
 
-The "*barrier function pattern*" (Kwong calls it so) is meant to cope with this issue. Let's look how it works.
+The "*barrier function pattern*" (Kwong calls it so) is meant to cope with this issue. Let's look how it works. We outsource the loop computation into another function, `double_sum`.
 ```julia
 function double_sum(data)
     total = 0
@@ -377,14 +377,14 @@ end
 Let's benchmark again.
 ```julia
 julia> @btime double_sum_of_random_data(100000)
-  212.368 μs (3 allocations: 781.32 KiB)
+  212.368 μs (3 allocations: 781.32 KiB)                        # Compare with above!
 
 julia> @btime double_sum_of_random_data(100001)
-  45.616 μs (3 allocations: 781.38 KiB)
+  45.616 μs (3 allocations: 781.38 KiB)                         # Compare with above!
 ```
 Not bad! A factor of 2 speed-up!
 
-What is the clue here? Julia can compile `double_sum` function for each type (`Int64`, `Float64`) seperately. As there is no chance then to change the type anymore internally, it can apply all kinds of optimizations for the respective functions. Julia's multiple dispatch capability then does the rest.
+What is the clue here? Julia can compile the `double_sum` function for each type (`Int64`, `Float64`) seperately. As there is no chance then to change the type anymore internally, it can apply all kinds of optimizations for the respective functions. Julia's multiple dispatch capability then does the rest.
 
 Conclusion: Multiple dispatch is not only a means flexibility, but is an important means for optimization.
 This can also be exploited to avoid ugly (and often inefficient) `if` conditions (`if type == Int64 do_this() else do_that() end`).
