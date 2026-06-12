@@ -33,6 +33,9 @@ plot(x,y,yerror=yerr, st=:scatter)              # scatter plot with error bars
 ```
 Next to `plot`, there exist `scatter`, `histogram`, `heatmap`, ... and many more as convenience aliases to `plot`. The names are more telling. But `plot` also knows the `st` (`seriestype`). Furthermore, the different attributes like `xlabel` (`xl`), `ylabel` (`yl`) `linewidth` (`lw`),  etc. have short forms. 
 
+Legend placement cat be done via `leg=:topleft`, etc. Remove legend, `leg=false`. `titlefont = (16, :red, :serif)` sets title font size, color and font style.
+
+And much more ...
 
 ## Mandelbrot / Julia Sets
 
