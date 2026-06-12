@@ -136,7 +136,7 @@ In many cases, with this little information extra, compilers really can do some 
 
 
 ### Struct of Arrays Pattern
-The next section ["Parallelism"](S2_parallelism.md)
+The next section ["Parallelism"](S3_parallelism.md)
 
 ### Memoization Pattern (idea)
 
