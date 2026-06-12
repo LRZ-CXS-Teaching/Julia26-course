@@ -386,7 +386,7 @@ Not bad! A factor of 2 speed-up!
 
 What is the clue here? Julia can compile the `double_sum` function for each type (`Int64`, `Float64`) seperately. As there is no chance then to change the type anymore internally, it can apply all kinds of optimizations for the respective functions. Julia's multiple dispatch capability then does the rest.
 
-Conclusion: Multiple dispatch is not only a means flexibility, but is an important means for optimization.
+Conclusion: Multiple dispatch is not merely a means of flexibility, but also an important means of optimization.
 This can also be exploited to avoid ugly (and often inefficient) `if` conditions (`if type == Int64 do_this() else do_that() end`).
 
 
