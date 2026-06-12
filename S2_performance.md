@@ -255,6 +255,29 @@ A speed-up of 1.28 (speed-up = reference-execution-time / other-execution-time ;
 There is still a tradeoff. `soa_data = StructArray(aos_data)` copies the AoS data into a new data structure. This means memory allocation! If one can dispense with the AoS data, and work only with the SoA data then, one can execute `aos_data = nothing; GC.gc()` in order to let the garbage collector remove the AoS data from memory. Also this requires some time!
 
 ### Memoization Pattern (idea)
+Fibonacci numbers. $f_n = f_{n-1} + f_{n-2}$, $f_1 = f_0 = 1$. A notorious example for inefficient recursion.
+```julia
+julia> using BenchmarkTools
+
+julia> fib(n) = n≤1 ? 1 : fib(n-1) + fib(n-2)
+fib (generic function with 1 method)
+
+julia> @btime fib(30)
+  6.870 ms (0 allocations: 0 bytes)
+```
+Let's retry.
+```julia
+julia> using Memoization
+
+julia> @memoize fibm(n) = n≤1 ? 1 : fibm(n-1) + fibm(n-2)
+fibm (generic function with 1 method)
+
+julia> @btime fibm(30)
+  95.111 ns (0 allocations: 0 bytes)
+```
+That's better. 
+
+Semantic: [Memoization pattern](https://en.wikipedia.org/wiki/Memoization) means to cache results that where already computed, in order to avoid re-computation. That's the trick. For possible implementation details, see e.g. the book of Kwong. 
 
 ### Barrier Function Pattern (type-unstable functions) ?
 
