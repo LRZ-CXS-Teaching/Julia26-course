@@ -2,9 +2,6 @@
 
 ## General Considerations
 
-<details>
-    <summary>Click to see content</summary>
-
 > [!WARNING]
 > **Rules for Optimization**
 > * Measure and analyze performance before optimizing!
@@ -48,7 +45,6 @@ It's not a shame to use Google (or, even Google AI) for that.
 A lot of Julia's power comes from it's design to make even functions, types, and the code itself first citizen objects in the language. Using macros, code can be auto-generated, or auto-annotated for whichever purposes. `@time` is one example. (E.g. see [Introduction to macros](https://www.youtube.com/watch?v=e6LGMeoQhfs) and/or [
 Macros and Metaprogramming in Julia](https://www.youtube.com/watch?v=LPkB2GYoOZI))
 
-</details>
 
 ## Special Patterns
 
