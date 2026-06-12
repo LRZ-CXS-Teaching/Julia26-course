@@ -402,7 +402,7 @@ The function call is then *possibly* replaced by the function body directly.
 ## Hands-on
 Don't be confused. The hands-on may not be related to "performance" directly, but also to show Julia programming styles and patterns in real-life applications.
 
-* Containers and Algorithms (data handling patterns)
+* [Containers and Algorithms (data handling patterns)](hands-on/S2/container_algorithms.md)
 * Plotting and Curve Fitting (Mandelbrot-/Julia-sets; 3 schemes to fit curves to data)
 * Operator Overloading (Julia's way to easy life - syntactic sugar)
 
