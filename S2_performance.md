@@ -6,7 +6,7 @@
 > **Rules for Optimization**
 > * Measure and analyze performance before optimizing!
 > * Optimize ONLY performance critical sections of code! ([20/80 rule](https://en.wikipedia.org/wiki/Pareto_principle))
-> * First: CORRECT!!!   Second: Efficient! (TDD)
+> * First: CORRECT!!!   Second: Efficient! ([TDD](https://en.wikipedia.org/wiki/Test-driven_development))
 
 Modern hardware is really complex (both CPUs and GPUs). Compilers and hardware use already quite some heuristics to analyze flow and memory access patterns in order to optimally perform on the hardware, and to support programmers. However, neither of them can work magic, either. And both are obliged to keep the `correct` semantics, primarily.
 
