@@ -39,7 +39,7 @@ And,
 > * Badly maintained code is very often (if not always) also badly performing.
 
 
-Julia provides already a feature-rich syntax and a large and versatile package eco-system which makes lot of even complex programming tasks very comprehensible. Search for them! Use them!
+Julia provides already a feature-rich syntax and a large and versatile module/package eco-system which makes a lot of even complex programming tasks very comprehensible. Search for them! Use them!
 It's not a shame to use Google (or, even Google AI) for that.
 
 A lot of Julia's power comes from it's design to make even functions, types, and the code itself first citizen objects in the language. Using macros, code can be auto-generated, or auto-annotated for whichever purposes. `@time` is one example. (E.g. see [Introduction to macros](https://www.youtube.com/watch?v=e6LGMeoQhfs) and/or [
