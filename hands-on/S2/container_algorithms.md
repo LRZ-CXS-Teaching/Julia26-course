@@ -91,13 +91,13 @@ String15["Eddard", "Robert", "Jaime", "Cersei", "Daenerys", "Jon", "Sansa", "Ary
 ```
 You can even change the entries if wanted (`df[1,1] = "Somebody-else"`), and store the result back into a file (`CSV.write("output.csv",df)`).
 
-## Exercise
+### Tasks
 You have some helper functions at hand: `filter`, `sort`, `transform`, `map`, `shuffle` (from `Random`), `sum`, ... and many more. (Google for what you need in case!)
 
 Do the following operations:
 1. Find all characters with surname `Stark`!
 2. Find all characters younger or as old as 30 years!
-3. Find all characters with a first name that starts with letter `J` till `P`!
+3. Find all characters with a first name that starts with letter `J` till `S`!
 4. Sort the data by surname!
 5. Sort the data by surname, where also the first names are sorted!
 6. Find all characters younger than 30, sorted by surname!
