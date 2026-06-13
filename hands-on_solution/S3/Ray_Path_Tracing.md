@@ -294,6 +294,7 @@ end
 render()
 ```
 </details>
+
 The similarity to the original code using `Images` is still visible. We needed to change the annotation with `@everywhere`, on order to load modules on the workers, and to make the functions known on the workers, which are supposed to run there. In `render`, we needed to parallelize the `ProgressMeter`, and annotate the mail loop with `@distributed (+)`. So, it became a reduction. Within the loop, each loop-chunk contains its own local image storage, which is not a RGB pixel matrix anymore, but just a linear `Array`, where the R, G, B values per pixel are just in sequence, $R_1, G_1, B_1, R_2, G_2, B_2, ...$. And we diverted to the very simple graphics format [PPM](https://de.wikipedia.org/wiki/Portable_Anymap).
 
 I've also added some more `println()` statments to see the progress of initialization in the Slurm job log output (`flush()` cares for releasing the caches - otherwise you may see nothing). It is a good idea for automated workflows to print as much debugging info as reasonably possible to early recognize ill states of jobs.
