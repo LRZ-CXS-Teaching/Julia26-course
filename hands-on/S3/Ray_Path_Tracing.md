@@ -5,7 +5,7 @@ Therefore, two examples below are not meant to be an introduction to any of the 
 
 The second thing is your task.
 
-**Parallelize the Main-Loop!** Either with threads, or with workers. In principle, you can also use MPI for that.
+**Parallelize the Main-Loop!** Either with threads, or with workers. In principle, you can also use MPI for that.PDE_solver.md
 
 ## Ray-Tracing
 The program is as follows.
@@ -254,6 +254,7 @@ This program is admittedly already a bit more complex. It is supposed to be exte
 It requires the modules `Colors` and `Images` to be installed. And then, it can be executed via `julia raytrace.jl`. A PNG file with the result is produced (if everything works well).
 The serial program may run in about 30 seconds. You can change the view port resolution (and reduce the angle resolution accordingly) if you want more workload.
 
+#### Exercise
 Finding the main loop is certainly not that hard. Parallelize it with threads or with workers (or otherwise). Check the scaling! (Does parallelism accelerate?)
 
 <details>
@@ -476,6 +477,7 @@ The programm appears a bit more "rudimentary" than the above ray-tracing example
 It requires the modules `Images` and `ProgressMeter` in addition (the latter is maybe only a nice gimick - a progress bar; cool thing: It is thread-compatible!). 
 The script can be executed via `julia pathtrace.jl`. A PNG file with the result is produced. The serial program runs for about 10 minutes. 
 
+#### Exercise
 Find the main loop, and parallelize it with threads, or with workers. Check the scaling!
 
 <details>
