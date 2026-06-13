@@ -234,3 +234,11 @@ plot!([-5:0.01:5],x -> f(x;p=[m_c,m_b,m_a]), label="fitted function")
 
 savefig("bayes_result.pdf")
 ```
+
+<details>
+  <summary>Bayes inference fit result</summary>
+
+<div align="center">
+  <img src="bayes_result.png" width="600" alt="fit result plot">
+</div>
+</details>
