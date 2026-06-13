@@ -75,7 +75,7 @@ import Base: +, -, *
 *(a::Real, v::Vec3) = Vec3(a * v.x, a * v.y, a * v.z)
 
 # scalar multiplication from right
-*(v::Vec3, a::Real) = a * v
+*(v::Vec3, a::Real) = a * v                           # good practice: implementation in terms of another - code reuse; single point of change/failure
 ```
 
 What else? Custom IO for user-defined types?
