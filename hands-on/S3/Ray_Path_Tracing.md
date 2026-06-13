@@ -255,7 +255,7 @@ It requires the modules `Colors` and `Images` to be installed. And then, it can 
 The serial program may run in about 30 seconds. You can change the view port resolution (and reduce the angle resolution accordingly) if you want more workload.
 
 #### Exercise
-Finding the main loop is certainly not that hard. Parallelize it with threads or with workers (or otherwise). Check the scaling! (Does parallelism accelerate?)
+Finding the main loop is certainly not that hard. Parallelize it with threads. Check the scaling! (Does parallelism accelerate?)
 
 <details>
   <summary>Plot-Result</summary>
@@ -478,7 +478,7 @@ It requires the modules `Images` and `ProgressMeter` in addition (the latter is 
 The script can be executed via `julia pathtrace.jl`. A PNG file with the result is produced. The serial program runs for about 10 minutes. (Caution! `Images` is really a monster. It might take long to precompile.)
 
 #### Exercise
-Find the main loop, and parallelize it with threads, or with workers. Check the scaling!
+Find the main loop, and parallelize it with threads, or with `Distributed` workers. Check the scaling!
 
 <details>
   <summary>Plot-Result</summary>
