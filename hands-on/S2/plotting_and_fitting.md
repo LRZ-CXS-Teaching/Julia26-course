@@ -133,6 +133,9 @@ plot!(df.x, model(df.x, a_opt), label="weighted fit", lw=2, color=:red)
 ```
 
 ### Least Square Polynom Fitting (LinearAlgebra)
-
+If it is about fitting some polynomial to data as we just exercised in the example above, an analytic solution actually exist to the $\chi^2$-minimization. As $f(x,a)$ depends linearly on the parameters (it's a polynomial!), one can easily form the derivative wrt. the $a_i$, and set
+```math
+\frac{\partial\chi^2}{\partial a_j} = 2\sum_{i=1}\frac{(y_i-a_1-a_2x-a_3x^2-\ldots)x^{j-1}}{\sigma_i^2}=0\;,\quad j=1,2,\ldots
+```
 
 ### Bayes Curve Fitting (Turing, FlexiChains)
