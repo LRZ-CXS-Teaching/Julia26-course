@@ -1,6 +1,6 @@
 # Operator Overloading - OOP (Tutorial)
 
-Let's assume you need some mathatical 3D vector type that also can intuitively be used (like e.g. in Matlab). Dot and cross products with operators $\dot$ and $\cross$, respectively, so that we could simply write
+Let's assume you need some mathatical 3D vector type that also can intuitively be used (like e.g. in Matlab). Dot and cross products with operators $\cdot$ and $\times$, respectively, so that we could simply write
 ```julia
 v₁ = vec3(1,2,3)
 v₂ = vec3(3,2,1)
