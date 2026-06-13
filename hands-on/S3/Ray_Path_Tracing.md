@@ -5,8 +5,7 @@ Therefore, two examples below are not meant to be an introduction to any of the 
 
 The second thing is your task.
 
-**Parallelize the Main-Loop!** Either with threads, or with workers. 
-In principle, you can also use MPI for that. This requires but quite more code changes compared with the others.
+**Parallelize the Main-Loop!** Either with threads, or with master/workers, or with MPI. The both latter both require but quite more code changes compared with threads.
 
 ## Ray-Tracing
 The program is as follows.
