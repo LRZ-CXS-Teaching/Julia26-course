@@ -404,7 +404,7 @@ Don't be confused. The hands-on may not be related to "performance" directly, bu
 
 * [Containers and Algorithms (data handling patterns)](hands-on/S2/container_algorithms.md)
 * [Plotting and Curve Fitting (Mandelbrot-/Julia-sets; 3 ways to fit curves to data)](hands-on/S2/plotting_and_fitting.md)
-* Operator Overloading (Julia's way to easy life - syntactic sugar)
+* [Operator Overloading](hands-on/S2/operator_overloading.md) (Julia's way to easy life in Object Orientation - syntactic sugar)
 
 
 
