@@ -169,7 +169,7 @@ which can easily be solved using `LinearAlgebra` (`x = A\b`).
 Create some random data from some polynomial, say order three, and fit all polynomials of orders zero to four to it.
 
 ### Bayes Curve Fitting -Tutorial (Turing, FlexiChains)
-Bayes model (curve) fitting relies on the Bayes inference process (model -> parameter prior probability, data (likelihood) -> posterior). Look e.g. E. T. Jayes, "Probability - The Logic of Science", for a imho very good overview (but Bayes literature is vast). 
+Bayes model (curve) fitting relies on the Bayes inference process (model -> parameter prior probability, data (likelihood) -> posterior). Look e.g. E. T. Jayes, "Probability - The Logic of Science", for a imho very good overview (but literature on Bayesianismis vast). 
 
 After a posterior is obtained, it is usually analized using MCMC (Markov Chain Monte-Carlo) methods in order to obtain the expected parameters of the posterior distribution. (Mean values are minimizing the uncertainties as utility function -> Jaynes). Alternatively, one can also maximize the posterior wrt. to the fit parameters.
 
