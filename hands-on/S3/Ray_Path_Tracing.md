@@ -497,5 +497,5 @@ With 80 threads, it took about half an hour (35 minutes) on a 80 cores of a Inte
 </details>
 
 ## Remark
-The `Images` module is huge wrt. to its dependencies. Precompilation requires possibly quite some time. Ahead-of-time compilation is recommended. Or, just avoid such packages in HPC workflows alltogether.
-This is unfortunately a real pitfall in Julia.
+The `Images` module is huge wrt. to its dependencies. Precompilation requires possibly quite some time. Ahead-of-time compilation is advisable. Or, just avoid such packages in HPC workflows alltogether.
+This is unfortunately a real pitfall in julia.
