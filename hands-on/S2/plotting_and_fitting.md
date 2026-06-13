@@ -163,8 +163,9 @@ a_3\\
 \vdots
 \end{pmatrix}
 ```
-
+which can easily be solved using `LinearAlgebra` (`x = A\b`).
 
 #### Exercise
+Create some random data from some polynomial, say order three, and fit all polynomials of orders zero to four to it.
 
 ### Bayes Curve Fitting (Turing, FlexiChains)
