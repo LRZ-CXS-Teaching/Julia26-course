@@ -52,6 +52,12 @@ function cross(v1::Vec3, v2::Vec3)
         v1.x * v2.y - v1.y * v2.x
     )
 end
+
+v₁ = Vec3(1, 2, 3)
+v₂ = Vec3(3, 2, 1)
+v₃ = v₁ × v₂                         # result: Vec3(-4.0, 8.0, -4.0)
+v₁ ⋅ v₃ == 0                         # true
+v₂ ⋅ v₃ == 0                         # true
 ```
 <details>
 
