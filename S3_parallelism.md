@@ -805,4 +805,4 @@ This creates a thin wrapper script, `~/.julia/bin/mpiexecjl`, where you afterwar
 ## Hands-on
 
 - [`Ray-Tracing / Path-Tracing (Visualization)`](hands-on/S3/Ray_Path_Tracing.md)
-- [`Solving PDEs computationally`](hands-on/S3/PDE_solver.md)
+- [`Solving PDEs computationally (Tutorial)`](hands-on/S3/PDE_solver.md)
