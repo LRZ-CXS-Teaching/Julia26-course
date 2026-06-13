@@ -30,7 +30,10 @@ f(x) = 4.3 + 2.5x - 3.2x^2 + 0.3x^3
 xvs = collect(0.0:10)
 σ   = rand(Uniform(0.5,5.0),length(xvs))
 # yvs = [f(xvs[i]) + σ_i[i]*randn() for i in 1:length(xvs)]
-yvs = f.(xvs) .+ randn.() .* σ
+# or, shorter
+# yvs = f.(xvs) .+ randn.() .* σ
+# or, even shorter
+@. yvs = f(xvs) + randn() * σ
 
 plot(f,minimum(xvs),maximum(xvs),label="exact",linewidth=2)
 plot!(xvs,yvs,yerror=σ,st=:scatter,label="data")
