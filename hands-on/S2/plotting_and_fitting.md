@@ -147,9 +147,23 @@ the above equation turns into the following linear system
 \langle1\rangle & \langle x\rangle & \langle x^2\rangle & \ldots \\
 \langle x\rangle & \langle x^2\rangle & \langle x^3\rangle & \ldots \\
 \langle x^2\rangle & \langle x^3\rangle & \langle x^4\rangle & \ldots \\
-\vdots & \vdots & \vdots $ \ddots
+\vdots & \vdots & \vdots & \ddots
+\end{pmatrix}
+\begin{pmatrix}
+a_1\\
+a_2\\
+a_3\\
+\vdots
+\end{pmatrix}
+=
+\begin{pmatrix}
+\langle y\rangle \\
+\langle yx\rangle \\
+\langle yx^2\rangle \\
+\vdots
 \end{pmatrix}
 ```
+
 
 #### Exercise
 
