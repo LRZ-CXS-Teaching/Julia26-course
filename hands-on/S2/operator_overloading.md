@@ -29,7 +29,7 @@ v₂ = Vec3(3, 2, 1)
 s = v₁ ⋅ v₂             # result: 10.0
 ```
 
-## Task
+### Exercise
 Repeat that for the cross-product.
 ```math
 v \times v = \begin{pmatrix}
@@ -39,3 +39,56 @@ v \times v = \begin{pmatrix}
 \end{pmatrix}
 ```
 **Hint:**  `LinearAlgebra` also contains also already a `cross` function. Just do as for `dot`!
+
+<details>
+    <summary>Solution</summary>
+
+```julia
+import LinearAlgebra: cross
+function cross(v1::Vec3, v2::Vec3)
+    return Vec3(
+        v1.y * v2.z - v1.z * v2.y,
+        v1.z * v2.x - v1.x * v2.z,
+        v1.x * v2.y - v1.y * v2.x
+    )
+end
+```
+<details>
+
+If you want to overload also `+`, `-`, `*`, ... etc. they are from `Base`. (That's a bit confusing ... Simply consult Google.)
+```julia
+import Base: +, -, *
+
+# addition of two vectors
++(v1::Vec3, v2::Vec3) = Vec3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z)
+
+# subtraktion of two vectors
+-(v1::Vec3, v2::Vec3) = Vec3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z)
+
+# scalar multiplication from left
+*(a::Real, v::Vec3) = Vec3(a * v.x, a * v.y, a * v.z)
+
+# scalar multiplication from right
+*(v::Vec3, a::Real) = a * v
+```
+
+What else? Custom IO for user-defined types?
+```julia
+struct Person
+    name::String
+    surname::String
+    age::UInt64
+end
+
+p₁ = Person("John","Doe",42)
+
+println(p₁)                  # result: Person("John", "Doe", 0x000000000000002a)
+```
+Let's have it nicer.
+```julia
+Base.show(io::IO, z::Person) = print(io,z.name," ",z.surname," is ",z.age," years old.")
+
+println(p₁)                  # result: John Doe is 42 years old.
+```
+
+And more, and more, ... 
