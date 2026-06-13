@@ -66,7 +66,7 @@ heatmap(-2:0.001:1,-1:0.001:1,(x,y)->(c=x+y*im; z=0+0im; for i in 1:100 z = z^2 
   <summary>plot result</summary>
 
 <div align="center">
-  <img src="mandelbrot.png" width="800" alt="Mandelbrot set">
+  <img src="mandelbrot.png" width="600" alt="Mandelbrot set">
 </div>
 </details>
 
