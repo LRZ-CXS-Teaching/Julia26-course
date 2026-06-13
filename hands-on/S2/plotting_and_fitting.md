@@ -168,4 +168,69 @@ which can easily be solved using `LinearAlgebra` (`x = A\b`).
 #### Exercise
 Create some random data from some polynomial, say order three, and fit all polynomials of orders zero to four to it.
 
-### Bayes Curve Fitting (Turing, FlexiChains)
+### Bayes Curve Fitting -Tutorial (Turing, FlexiChains)
+Bayes model (curve) fitting relies on the Bayes inference process (model -> parameter prior probability, data (likelihood) -> posterior). Look e.g. E. T. Jayes, "Probability - The Logic of Science", for a imho very good overview (but Bayes literature is vast). 
+
+After a posterior is obtained, it is usually analized using MCMC (Markov Chain Monte-Carlo) methods in order to obtain the expected parameters of the posterior distribution. (Mean values are minimizing the uncertainties as utility function -> Jaynes). Alternatively, one can also maximize the posterior wrt. to the fit parameters.
+
+This process is automatable using Gibbs sampling such that packages like [BUGS](https://en.wikipedia.org/wiki/Bayesian_inference_using_Gibbs_sampling) and [JAGS](https://mcmc-jags.sourceforge.io/) could be developed to ease the application of Bayesian inference. In Julia, there are several module/packages for this purpose. We show here a [Turing](https://turinglang.org/) example, paired with [FlexiChains](https://github.com/penelopeysm/FlexiChains.jl) for the MCMC sampling and process control.
+
+Consider the following short example. (Seriously, believe me! Much more complexity is easily achievable in this field!)
+
+```julia
+using Turing
+using LinearAlgebra
+using Plots
+using FlexiChains
+
+# define Bayes model using Turing's DSL
+@model function quadratic_regression(x, sigmas)
+    a ~ Normal(0, 10.0)
+    b ~ Normal(0, 10.0)
+    c ~ Normal(0, 10.0)
+
+    μ = a .* x.^2 .+ b .* x .+ c
+
+    y ~ MvNormal(μ, Diagonal(sigmas.^2))
+end
+
+# example data 10 points)
+const N = 10
+x_data = collect(range(-5, 5, length=N))
+sigma_data = rand(Uniform(0.5, 2.0), N)
+true_p = [-1.0, 2.5, 0.8]                 # true parameters
+f(x;p) = p[1] + p[2]*x + p[3]*x^2         # true function underlying model p[1] == c, p[2] == b, p[3] == a
+y_data = [f(x_data[i]; p=true_p) + rand(Normal(0, sigma_data[i])) for i in 1:N]
+
+# define Bayes posterior
+posterior = quadratic_regression(x_data, sigma_data) | (; y = y_data)
+
+# do sampling
+chain = sample(posterior, NUTS(), 5000)
+
+# show MCMC summary
+stats = summarystats(chain)
+display(stats)
+
+# evaluate parameter's MCMC statistics
+using Statistics
+a_samples = vec(chain[:a])
+b_samples = vec(chain[:b])
+c_samples = vec(chain[:c])
+m_a = mean(a_samples)
+m_b = mean(b_samples)
+m_c = mean(c_samples)
+
+# parameter uncertainties and covariance matrix if needed
+#sd_a = std(a_samples)
+#sd_b = std(b_samples)
+#sd_c = std(c_samples)
+#samples_matrix = hcat(a_samples, b_samples, c_samples)
+#cov_matrix = cov(samples_matrix)
+
+plot([-5:0.01:5],x -> f(x;p=true_p), label="original function")
+plot!(x_data,y_data,yerror=sigma_data,st=:scatter, label="data with uncertainties")
+plot!([-5:0.01:5],x -> f(x;p=[m_c,m_b,m_a]), label="fitted function")
+
+savefig("bayes_result.pdf")
+```
