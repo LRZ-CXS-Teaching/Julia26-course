@@ -202,7 +202,7 @@ true_p = [-1.0, 2.5, 0.8]                 # true parameters [c,b,a]
 f(x;p) = p[1] + p[2]*x + p[3]*x^2         # true function underlying model p[1] == c, p[2] == b, p[3] == a
 y_data = [f(x_data[i]; p=true_p) + rand(Normal(0, sigma_data[i])) for i in 1:N]
 
-# define Bayes posterior
+# define Bayes posterior : reads a bit like "model given data", P(model|data)
 posterior = fit_model(x_data, sigma_data) | (; y = y_data)
 
 # do sampling
