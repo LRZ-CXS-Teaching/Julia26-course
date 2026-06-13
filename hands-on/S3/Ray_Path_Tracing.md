@@ -472,10 +472,10 @@ render()
 ```
 </details>
 
-The programm appears a bit more "rudimentary" than the above ray-tracing example. It lacks some finess concerning the user interface (see the comments on e.g. variable restrictions). The program contains otherwise the same essential data structures as the ray-tracer, and also represents the same scene setup (5 colored spheres in the same arrangement). As an illustration for parallelism, it will have to suffice.
+The programm appears a bit more "rudimentary" than the above ray-tracing example. It lacks some finess concerning the user interface of the data structures (see the comments on e.g. variable restrictions). The program contains otherwise the same essential data structures as the ray-tracer, and also represents the same scene setup (5 colored spheres in the same arrangement). As an illustration for parallelism, it will have to suffice.
 
 It requires the modules `Images` and `ProgressMeter` in addition (the latter is maybe only a nice gimick - a progress bar; cool thing: It is thread-compatible!). 
-The script can be executed via `julia pathtrace.jl`. A PNG file with the result is produced. The serial program runs for about 10 minutes. 
+The script can be executed via `julia pathtrace.jl`. A PNG file with the result is produced. The serial program runs for about 10 minutes. (Caution! `Images` is really a monster. It might take long to precompile.)
 
 #### Exercise
 Find the main loop, and parallelize it with threads, or with workers. Check the scaling!
