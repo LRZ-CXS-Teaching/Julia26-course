@@ -32,8 +32,9 @@ xvs = collect(0.0:10)
 # yvs = [f(xvs[i]) + σ_i[i]*randn() for i in 1:length(xvs)]
 # or, shorter
 # yvs = f.(xvs) .+ randn.() .* σ
-# or, even shorter
-@. yvs = f(xvs) + randn() * σ
+# or
+yvs = similar(xvs)
+@. yvs = f(xvs) + randn() * σ                           # memory must be already allocated in order this to make work
 
 plot(f,minimum(xvs),maximum(xvs),label="exact",linewidth=2)
 plot!(xvs,yvs,yerror=σ,st=:scatter,label="data")
