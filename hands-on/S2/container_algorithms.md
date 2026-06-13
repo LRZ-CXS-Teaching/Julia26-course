@@ -115,9 +115,9 @@ More often than not, CSV data stem from logs or so, and contain date-time data. 
 
 Let's say, we want to plot them. No problem.
 ```julia
-julia> using DataFrames, Dates, CSV, Plots
-julia> df = CSV.read("cpu_temp.csv", DataFrame; dateformat="yyyy-mm-ddTHH:MM:SS+02:00")
-julia> plot(df.Timestamp, df.Temperature_C)
+using DataFrames, Dates, CSV, Plots
+df = CSV.read("cpu_temp.csv", DataFrame; dateformat="yyyy-mm-ddTHH:MM:SS+02:00")
+plot(df.Timestamp, df.Temperature_C)
 ```
 The result looks as follows.
 
