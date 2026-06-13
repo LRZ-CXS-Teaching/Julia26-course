@@ -184,7 +184,7 @@ using Plots
 using FlexiChains
 
 # define Bayes model using Turing's DSL
-@model function quadratic_regression(x, sigmas)
+@model function fit_model(x, sigmas)
     a ~ Normal(0, 10.0)
     b ~ Normal(0, 10.0)
     c ~ Normal(0, 10.0)
@@ -194,16 +194,16 @@ using FlexiChains
     y ~ MvNormal(μ, Diagonal(sigmas.^2))
 end
 
-# example data 10 points)
+# example data with 10 points
 const N = 10
 x_data = collect(range(-5, 5, length=N))
 sigma_data = rand(Uniform(0.5, 2.0), N)
-true_p = [-1.0, 2.5, 0.8]                 # true parameters
+true_p = [-1.0, 2.5, 0.8]                 # true parameters [c,b,a]
 f(x;p) = p[1] + p[2]*x + p[3]*x^2         # true function underlying model p[1] == c, p[2] == b, p[3] == a
 y_data = [f(x_data[i]; p=true_p) + rand(Normal(0, sigma_data[i])) for i in 1:N]
 
 # define Bayes posterior
-posterior = quadratic_regression(x_data, sigma_data) | (; y = y_data)
+posterior = fit_model(x_data, sigma_data) | (; y = y_data)
 
 # do sampling
 chain = sample(posterior, NUTS(), 5000)
