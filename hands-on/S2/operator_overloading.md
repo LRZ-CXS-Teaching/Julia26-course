@@ -59,7 +59,7 @@ v₃ = v₁ × v₂                         # result: Vec3(-4.0, 8.0, -4.0)
 v₁ ⋅ v₃ == 0                         # true
 v₂ ⋅ v₃ == 0                         # true
 ```
-<details>
+</details>
 
 If you want to overload also `+`, `-`, `*`, ... etc. they are from `Base`. (That's a bit confusing ... Simply consult Google.)
 ```julia
