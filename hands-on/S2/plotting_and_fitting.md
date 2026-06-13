@@ -97,7 +97,11 @@ The general task: Given some data with uncertainties, e.g. from measurements, fi
 In lack of real data, we'll create some for us in different ways (see below).
 
 ### Least Square Fitting (LsqFit)
+The idea is simple. One has some data, $[x_i, y_i, \sigma_i]$ ($i=1,\ldots,N$), say from some measurement. $\sigma_i$ are the obtained uncertainties for the $y_i$'s. Next, you take some function, $f(x;a_1,a_2,\ldots)$, which also depends on some parameters, $a = a_1, a_2,\ldots$. "Least Squares" now means that one tries to minimize the sum of the quadratic differences between data and function with respect to these parameters.
 
+```math
+\rm{Lsq] \equiv \chi^2(a) = \sum_{i=1}^N\left(\frac{y_i-f(x_i;a)}{\sigma_i}\right)^2 \rightarrow \text{min! (wrt. )a}
+```
 
 
 ### Least Square Polynom Fitting (LinearAlgebra)
