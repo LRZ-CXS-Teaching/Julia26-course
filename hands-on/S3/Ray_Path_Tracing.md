@@ -495,3 +495,5 @@ With 80 threads, it took about half an hour (35 minutes) on a 80 cores of a Inte
   <img src="../../miscellanea/images/path_traced_scene.png" width="800" alt="ray tracing result">
 </div>
 </details>
+
+## Remark
