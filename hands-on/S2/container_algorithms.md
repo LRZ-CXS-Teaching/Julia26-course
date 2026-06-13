@@ -126,3 +126,8 @@ The result looks as follows.
 </div>
 
 Still a bit ugly. In the next exercise, you can learn more about plotting.
+
+## Further Reading
+- [collections](https://docs.julialang.org/en/v1/base/collections/)) : contains also docu on algorithms like `filter`, `replace`, `map`, ... (`transform` is from `DataFrames`)
+- [array](https://docs.julialang.org/en/v1/base/arrays/)
+- [sorting algorithms](https://docs.julialang.org/en/v1/base/sort/)
