@@ -447,6 +447,9 @@ julia> x = A\b
 ```
 and the `BenchmarkTools`.
 
+#### Final Remark
+Another often seen package for loop parallelization is [`FLoops`](https://github.com/JuliaFolds/FLoops.jl). It extends `Threads` in some ways. But follows otherwise the same semantics.
+
 
 ### Task-Parallelism (Distributed, pmap)
 Next to threading, julia offers another very versatile parallel programming model for CPU systems ... even for multi-systems. The [Distributed](https://github.com/JuliaLang/Distributed.jl) package provides support for so-called server-client/master-slave parallelism. The idea is that some "master" controls and distributes workload to other workers. A rather comprehensive documenation can be found here: [Multi-processing and Distributed Computing](https://docs.julialang.org/en/v1/manual/distributed-computing/).
