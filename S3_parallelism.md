@@ -791,7 +791,18 @@ MPIPreferences.use_system_binary()
 ```
 *Disclaimer* (though): MPI environments are quite special on HPC systems. And even more so is the integration into the resource manager and scheduler (e.g. Slurm). As in Julia, users install their modules on their own, it is also in their responsibility to correctly attach these to the environment. (For GPUs, it's the same.) But in case of issues, it is fair to simply contact the user support.
 
+Otherwise, just installing `MPI`, julia will provide a MPICH implemenation that you can also easily access. Just enter in the REPL
+```julia
+using MPI
+MPI.install_mpiexecjl()
+```
+This creates a thin wrapper script, `~/.julia/bin/mpiexecjl`, where you afterwards only need to add `~/.julia/bin` to the `PATH` variable (under Linux/Unix ... Under Windows, I would appreciate to receive some feedback from users. I've no system where I could test that on.). Usage is then
+```shell
+> export PATH=~/.julia/bin:$PATH           # (place it into your ~/.bashrc or so, to make it permanent)
+> mpiexecjl -n 4 julia -- ./MPI-hello.jl   # output as above
+```
+
 ## Hands-on
 
 - [`Ray-Tracing / Path-Tracing (Visualization)`](hands-on/S3/Ray_Path_Tracing.md)
-- PDE Solution (?)
+- [`Solving PDEs computationally`](hands-on/S3/PDE_solver.md)
