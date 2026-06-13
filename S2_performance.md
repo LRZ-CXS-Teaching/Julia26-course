@@ -399,6 +399,10 @@ The function call is then *possibly* replaced by the function body directly.
 "*possibly*": The compiler decides alone whether he really does it! And keep in mind that inlining might make debugging harder (as IPO/LTO does).
 
 
+### Finale Remark
+There are a lot of modules/packages out there that promise to be very convenient. And we do not recommend not to use them when they are appropriate. However, keep in mind that these modules need to be precompiled from time to time (when hardware changes - like on clusters, or when other packages are installed that interact with the former package, etc.) For large packages, this can be very time consuming. What is especially annoying if you CPU-budget is tight. Specifically in HPC, it is therefore advisable to avoid monster packages (`Images`, `Plots`, and many more etc.).
+The practical stance is, measure the progress of your codes. If they appear too slow, check out why!
+
 ## Hands-on
 Don't be confused. The hands-on may not be related to "performance" directly, but also to show Julia programming styles and patterns in real-life applications.
 
