@@ -782,7 +782,14 @@ I would not try to combine that with the `Distributed` parallelism, though!
 
 That's it. More I cannot do for you at the moment. (Means, from julia-pov, we are done. The rest is to learn to use MPI itself, and the related programming models.)
 
-*Disclaimer* (though): MPI environments are quite special on HPC systems. And even more so is the integration into the resource manager and scheduler (e.g. Slurm). As in Julia, users install their modules on their own, it is also in their responsibility to correctly attach these to the environment. (For GPUs, it's the same.) Please read the docu on [MPIPrecferences](https://juliaparallel.org/MPI.jl/stable/reference/mpipreferences/).
+<br>
+
+Some technical detail. For using an installed system MPI, it is usually best to use [`MPIPreferences`](https://juliaparallel.org/MPI.jl/stable/reference/mpipreferences/).
+```julia
+using MPIPreferences
+MPIPreferences.use_system_binary()
+```
+*Disclaimer* (though): MPI environments are quite special on HPC systems. And even more so is the integration into the resource manager and scheduler (e.g. Slurm). As in Julia, users install their modules on their own, it is also in their responsibility to correctly attach these to the environment. (For GPUs, it's the same.) But in case of issues, it is fair to simply contact the user support.
 
 ## Hands-on
 
