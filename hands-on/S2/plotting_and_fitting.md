@@ -166,7 +166,7 @@ a_3\\
 which can easily be solved using `LinearAlgebra` (`x = A\b`).
 
 #### Exercise
-Create some random data from some polynomial, say order three, and fit all polynomials of orders zero to four to it.
+Create some random data from some polynomial, say order three, and fit all polynomials of orders zero to four to it. (The 1st order fit is the "lineare regression line".)
 
 ### Bayes Curve Fitting -Tutorial (Turing, FlexiChains)
 Bayes model (curve) fitting relies on the Bayes inference process (model -> parameter prior probability, data (likelihood) -> posterior). Look e.g. E. T. Jayes, "Probability - The Logic of Science", for a imho very good overview (but literature on Bayesianismis vast). 
