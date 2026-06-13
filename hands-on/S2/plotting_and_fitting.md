@@ -31,6 +31,14 @@ yerr = 0.1 .* f.(x)                             # y-error (10% of function value
 y = f.(x) .+ yerr .* randn(length(yerr))        # y values with small errors
 plot(x,y,yerror=yerr, st=:scatter)              # scatter plot with error bars
 ```
+<details>
+  <summary>plot result</summary>
+
+<div align="center">
+  <img src="error-plot.png" width="800" alt="error graph plot">
+</div>
+</details>
+
 Next to `plot`, there exist `scatter`, `histogram`, `heatmap`, ... and many more as convenience aliases to `plot`. The names are more telling. But `plot` also knows the `st` (`seriestype`). 
 
 Furthermore, the different attributes like `xlabel` (`xl`), `ylabel` (`yl`) `linewidth` (`lw`),  etc. have short forms. 
