@@ -1,4 +1,4 @@
-# Operator Overloading - OOP (Tutorial)
+# Operator Overloading (Tutorial)
 
 Let's assume you need some mathatical 3D vector type that also can intuitively be used (like e.g. in Matlab). Dot and cross products with operators $\cdot$ and $\times$, respectively, so that we could simply write
 ```julia
