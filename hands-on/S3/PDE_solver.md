@@ -237,7 +237,7 @@ The major performance gain did we already obtain by pre-/describing the sparsity
 Furthermore, the solution time is anyway on the order of 2-3 minutes. It wasn't always so easy in the past!
 
 <div align="center">
-  <img src="shg.png" width="900" alt="Swift-Hohenberg">
+  <img src="shg.png" width="800" alt="Swift-Hohenberg">
 </div>
 
 **Final Remark:** There is also something like a "progress meter" for the ODE solver. Just google for it, if interested.
