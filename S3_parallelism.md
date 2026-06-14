@@ -458,7 +458,7 @@ Another often seen package for loop parallelization is [`FLoops`](https://github
 
 
 ### Task-Parallelism (Distributed, pmap)
-Next to threading, julia offers another very versatile parallel programming model for CPU systems ... even for multi-systems. The [Distributed](https://github.com/JuliaLang/Distributed.jl) package provides support for so-called server-client/master-slave parallelism. The idea is that some "master" controls and distributes workload to other workers. A rather comprehensive documenation can be found here: [Multi-processing and Distributed Computing](https://docs.julialang.org/en/v1/manual/distributed-computing/).
+Next to threading, julia offers another very versatile parallel programming model for CPU systems ... even for multi-node systems. The [Distributed](https://github.com/JuliaLang/Distributed.jl) package provides support for so-called server-client/master-slave parallelism. The idea is that some "master" controls and distributes workload to other workers. A rather comprehensive documenation can be found here: [Multi-processing and Distributed Computing](https://docs.julialang.org/en/v1/manual/distributed-computing/).
 
 For one, you can start Julia also with the option `-p/--procs <number>`. It automatically loads the `Distributed` module. Doing so, in the REPL, you then see "workers".
 ```julia
