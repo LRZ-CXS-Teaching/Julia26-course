@@ -631,7 +631,7 @@ steps = 50       # number of time steps
 c = 0.1          # diffusion constant (dt * D / dx^2)
 
 # initialization of distributed arrays (type, dimension, worker-IDs)
-# profile init (e.g. Gauß curve, or a block in the middle)
+# profile init (e.g. square pulse (zero left and right from a range of one in the middle))
 u_old = DArray(I -> [ (idx > 40 && idx < 60) ? 1.0 : 0.0 for idx in I[1] ], (N,), workers())
 u_new = dzeros(N)
 
