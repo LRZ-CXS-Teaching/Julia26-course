@@ -745,19 +745,19 @@ for i in workers()
   rmprocs(i)
 end
 ```
-All that's now required is a file named `taskdb.txt`, with each line containing one command. This Julia script can be executed then with `-p` in order to specify the number of workers. And it can run repeatedly until all tasks were processed. 
+All that's now required is a file named `taskdb.txt`, with each line containing one shell command. This Julia script can be executed then with `-p` in order to specify the number of workers, and `-t` for possibly threads. And it can run repeatedly until all tasks were processed (therefore, bookkeeping). 
 </details>
 
 #### SlurmClusterManager Extension
-If you need to work on several nodes - memory requirements, or scaling through parallelism larger to get your production through, `Distributed` can be combined with cluster managers. We have only experience with [`SlurmClusterManager`](https://github.com/JuliaParallel/SlurmClusterManager.jl), so we can only show this here. All that's necessary is
+If you need to work on several nodes - because of memory requirements, or scaling larger through parallelism to get the production through, `Distributed` can be combined with cluster managers. We have only experience with [`SlurmClusterManager`](https://github.com/JuliaParallel/SlurmClusterManager.jl), so we can only show this here. All that's necessary is
 ```julia
 using Distributed, SlurmClusterManager
 addprocs(SlurmManager())
 ```
-That's really it. The rest is configured via the Slurm `sbatch` parameters (`--nodes`, `--ntasks-per-node`, ...). The SlurmManager runs srun under the hood to distribute the workers to the respective Slurm tasks on the allocated nodes.
+That's really it. The number of workers is configured via the Slurm `sbatch` parameters (`--nodes`, `--ntasks-per-node`, ...). The SlurmManager runs `srun` under the hood to distribute the workers to the respective Slurm tasks on the allocated nodes.
 
 #### Final Remark
-`Distributed` can be combined with threads. Specifically, `pmap` can distribute/schedule work on workers, where each might run on several threads, in order to execute the function faster. 
+`Distributed` can be combined with threads. Specifically, `pmap` can distribute/schedule work on workers, where each worker might run several threads (on as many CPUs), in order to execute a function faster. 
 
 Beware of overcommitment!
 
