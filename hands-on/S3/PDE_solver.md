@@ -81,4 +81,10 @@ plot(p1, p2, layout=(1, 2), size=(900, 400), bottom_margin = 4mm, left_margin = 
 </div>
 
 ## PDE Example (showcase)
-One can also solve partial different equations (PDE) with this method.
+One can also solve partial different equations (PDE) with this method. Let's take as example the Swift-Hohenberg equation.
+```math
+\frac{\partial}{\partial t} u(t,x,y) = \epsilon u -(1+\Delta)^2u - u^3\;,\quad t\ge0, (x,y)\in [0,L]\times[0,L]
+```
+```math
+\tex{IC: } u(t=0,x,y) = u_0(x,y)\;,\quad \text{BC: } u(t,x+L,y) = u(t,x,y) = u() 
+```
