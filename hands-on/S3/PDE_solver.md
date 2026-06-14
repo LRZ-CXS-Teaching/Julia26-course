@@ -236,6 +236,8 @@ The major performance gain did we already obtain by pre-/describing the sparsity
 
 Furthermore, the solution time is anyway on the order of 2-3 minutes. It wasn't always so easy in the past!
 
+Here is how it might look (RNG individualizes possibly).
+
 <div align="center">
   <img src="shg.png" width="800" alt="Swift-Hohenberg">
 </div>
