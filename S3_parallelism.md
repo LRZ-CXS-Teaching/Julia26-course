@@ -697,7 +697,7 @@ The benefit for this example is negative. `pmap` comes with quite some overhead.
 <details>
 	<summary>Jobfarming with Bookkeeping</summary>
 
-If you have a lot of independent tasks - e.g. you want to run some program independently with many parameters for, say, uncertainty quantification, or, you want to process a bunch of input files with a program, where even file can be processed independently - and some program that should be executed in a shell (doing that directly in Julia would of course be much more efficient ;) ). Such a "job farmer" in julia can be realized as follows.
+If you have a lot of independent tasks - e.g. you want to run some program independently with many parameters for, say, uncertainty quantification, or, you want to process a bunch of input files with a program, where every file can be processed independently - and some program that should be executed in a shell (doing that directly in Julia would of course be much more efficient ;) ). Such a "job farmer" in julia can be realized as follows.
 
 ```julia
 using Distributed
