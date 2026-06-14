@@ -70,8 +70,9 @@ title!("Phase Space")
 xlabel!("prey (x)")
 ylabel!("predator (y)")
 
+using Plots.Measures                             # to fit later margines, such that labels aren't cut
 # both plots in one
-plot(p1, p2, layout=(1, 2), size=(900, 400))
+plot(p1, p2, layout=(1, 2), size=(900, 400), bottom_margin = 4mm, left_margin = 4mm)
 ```
 </details>
 
