@@ -25,48 +25,46 @@ x_0 \\ y_0
 ```
 How can one solve it in Julia?
 ```julia
-using DifferentialEquations
-using Plots
+using DifferentialEquations, Plots
 
-# 1. System von Differentialgleichungen definieren (In-place Format)
+# 1. define ODE system (in-place format)
 function lotka_volterra!(du, u, p, t)
-    x, y = u          # x: Beutepopulation, y: Räuberpopulation
-    α, β, δ, γ = p    # Systemparameter
+    x, y = u          # x: prey population, y: predator population
+    α, β, δ, γ = p    # system parameters
     
-    du[1] = α * x - β * x * y      # Ableitung dx/dt
-    du[2] = δ * x * y - γ * y      # Ableitung dy/dt
+    du[1] = α * x - β * x * y      # dx/dt
+    du[2] = δ * x * y - γ * y      # dy/dt
 end
 
-# 2. Anfangsbedingungen festlegen
-u0 = [1.0, 1.0]       # Startpopulationen für [Beute, Räuber]
+# 2. initial conditions (IC)
+u0 = [1.0, 1.0]       # start populationen for [prey, predetor]
 
-# 3. Zeitspanne für die Simulation definieren
-tspan = (0.0, 20.0)   # Von t=0 bis t=20
+# 3. define time span for simulation
+tspan = (0.0, 20.0)   # t=0 till t=20
 
-# 4. Parameterwerte definieren
-# α (Wachstum Beute), β (Jagdeffizienz), δ (Fortpflanzung Räuber), γ (Sterberate Räuber)
+# 4. define system parameters
+# α (prey growth rate), β (hunting efficiency), δ (reproduction rate predetor), γ (mortality rate predetor)
 p = [1.5, 1.0, 1.0, 3.0]
 
-# 5. Das ODEProblem-Objekt erstellen
+# 5. ode problem object
 prob = ODEProblem(lotka_volterra!, u0, tspan, p)
 
-# 6. Die Gleichung numerisch lösen (Tsit5 ist ein moderner Standard-Solver)
+# 6. solving computationally (Tsit5 is a modern standard solver)
 sol = solve(prob, Tsit5())
 
-# 7. Ergebnisse plotten
-# Plot 1: Populationsentwicklung über die Zeit
-p1 = plot(sol, labels=["Beute (x)" "Räuber (y)"], lw=2)
-title!("Lotka-Volterra Zeitreihe")
-xlabel!("Zeit (t)")
-ylabel!("Population")
+# 7. plot results
+# Plot 1: population development over time
+p1 = plot(sol, labels=["prey (x)" "predetor (y)"], lw=2)
+title!("Lotka-Volterra Time Series")
+xlabel!("time (t)")
+ylabel!("population")
 
-# Plot 2: Phasenzustandsraum (Räuber vs Beute)
+# Plot 2: phase space (predetor vs prey)
 p2 = plot(sol, vars=(1, 2), lw=2, legend=false)
-title!("Phasenraum-Portrait")
-xlabel!("Beute (x)")
-ylabel!("Räuber (y)")
+title!("Phase Space")
+xlabel!("prey (x)")
+ylabel!("predetor (y)")
 
-# Beide Plots nebeneinander anzeigen
+# both plots in one
 plot(p1, p2, layout=(1, 2), size=(900, 400))
-
 ```
