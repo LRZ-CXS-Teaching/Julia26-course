@@ -226,17 +226,18 @@ println("VTK export finished! Open 'swift_hohenberg_sparse_vtk/hexagons_sparse.p
 It can be executed via `julia shg.jl`, if all required modules are already installed.
 
 > [!WARNING]
-> **Disclaimer**
+> **Caution!!**
 > One should not try to thread-parallelize this code! The solver uses internally `LinearAlgebra`.
-> And so, we can apply `BLAS` parallelization (`OMP_NUM_THREADS=4 julia shg.jl`).
+> And so, we can apply `BLAS` parallelization (`OMP_NUM_THREADS=4 julia shg.jl`). Extra
+> threading might lead to overcommitment on the hardware.
 
-Don't be too disappointed. The speed-up gain is rather small. The system is too small to really put much workload on more than two threads.
+Don't be too disappointed. The speed-up gain is anyway rather small. The system is simply too small to really put much workload on more than two threads.
 
-The major performance gain did we already obtain by pre-/describing the sparsity pattern of the Jacobian used (in CSC format) by the implicit ODE solver.
+The major performance gain, we already obtained by pre-/describing the sparsity pattern of the Jacobian used (in CSC format) by the implicit ODE solver.
 
-Furthermore, the solution time is anyway on the order of 2-3 minutes. It wasn't always so easy in the past!
+Furthermore, the solution time is merely on the order of 2-3 minutes. There is then not much need of further optimization, possibly.
 
-Here is how it might look (RNG individualizes possibly).
+Here is how the results might look like (RNG individualizes maybe).
 
 <div align="center">
   <img src="shg.png" width="800" alt="Swift-Hohenberg">
