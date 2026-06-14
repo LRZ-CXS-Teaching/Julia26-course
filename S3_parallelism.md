@@ -570,7 +570,7 @@ So, we moved data to worker two, did some computation, and got the result. There
 
 Conclusion: Workers need to be considered as independent Julia instances (processes) that communicate with each other through functions. Data management must be done manually.
 
-Depending on you workflows, you can send data with function, or "allocate" data on the workers (via `@spawnat` or `@everywhere`). There are modules like [`SharedArrays`](https://docs.julialang.org/en/v1/stdlib/SharedArrays/) (on single machine) and [`DistributedArray`](https://juliaparallel.org/DistributedArrays.jl/stable/) (across several machines).
+Depending on the specific workflow requirements, one can send data with functions, or "allocate" data on the workers (via `@spawnat` or `@everywhere`). There are modules like [`SharedArrays`](https://docs.julialang.org/en/v1/stdlib/SharedArrays/) (on single machine) and [`DistributedArrays`](https://juliaparallel.org/DistributedArrays.jl/stable/) (across several machines), which can give more support for that.
 
 <details>
 	<summary>Stencil Lattice Update Example</summary>
