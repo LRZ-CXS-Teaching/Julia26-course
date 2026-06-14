@@ -27,7 +27,7 @@ In short: If a serial program requires a time $T_1$ to complete, where a fractio
 ```math
 T_N = (1-p)T_1 + p\frac{T_1}{N} = \left(1 - \left(1-\frac{1}{N}\right)p\right) T_1 \le T_1\;.
 ```
-We can re-express that in terms of speed-up: $S = T_1 / T_N$ (How much faster is the parallel execution with $N$ workers with respect to the serial execution?).
+We can re-express that in terms of *speed-up*: $S_N = T_1 / T_N$ (How much faster is the parallel execution with $N$ workers with respect to the serial execution?).
 ```math
 S_N = \frac{1}{(1-p)+p/N}\;,
 ```
