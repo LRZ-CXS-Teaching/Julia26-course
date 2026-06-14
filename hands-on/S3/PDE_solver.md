@@ -239,3 +239,5 @@ Furthermore, the solution time is anyway on the order of 2-3 minutes. It wasn't 
 <div align="center">
   <img src="shg.png" width="800" alt="Swift-Hohenberg">
 </div>
+
+**Final Remark:** There is also something like a "progress meter" for the ODE solver. Just google for it, if interested.
