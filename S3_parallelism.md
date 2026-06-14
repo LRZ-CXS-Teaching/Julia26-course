@@ -213,7 +213,7 @@ Using threading is rather direct. Here a `for`-loop example.
 4
 ```
 **So, usage is simple in this case! Annotate the for-loops. Only go sure that there are no loop-carried dependencies!!**
-A simple way to check that is to reserse the order of loop iterations, and checking whether the result is still the same.
+A simple way to check that, is to reserse the order of loop iterations, and to check whether the result is still the same.
 
 Instead of `--threads`, also `-t` can be used. Thread IDs don't start with 1 (kept for the main julia process)!
 
