@@ -804,9 +804,9 @@ This creates a thin wrapper script, `~/.julia/bin/mpiexecjl`, where you afterwar
 #### A HPC relevant Issue of MPI
 If you go massively parallel, Julia's complete setup might kill any success. If 1000+ ranks try to load some module at the same time, and note that it still needs to be precompiled, and then all start to fight for write locks, etc., or the package are pre-compiled already, but they are huge in the file system, the start-up process might vastly take time. 
 
-A work around is to let only rank 0 load the modules first. The other ranks wait in a barrier. Once ready, and rank 0 passes this barrier, too, the other ranks only need to load-read the modules.
+A workaround is to let only rank 0 load the modules first. The other ranks wait in a barrier. Once ready, rank 0 passes this barrier, too, and the other ranks then only need to load-read the modules. This removes the write-contention in the file-system.
 
-Already the pre-compilation itself - even if only serially - can take quite some while. It is probably quite a waste of time to perform it during a production job with possibly thousands of CPUs that idle then.
+But already the pre-compilation itself - even if only serially - can take quite some time. It is prossibly a waste of time/CPU-budget to perform the compilation during a production job with possibly thousands of CPUs then idling.
 There are packages to ahead-of-time (AOT) compile complete programs. See, for instance, [`PackageCompiler`](https://julialang.github.io/PackageCompiler.jl/dev/).
 
 ## Hands-on
