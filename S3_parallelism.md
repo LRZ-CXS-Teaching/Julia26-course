@@ -261,16 +261,15 @@ A = rand(1000,1000);
 B = rand(1000,1000);
 C = similar(A);
 
-@time matmul_serial!(C, A, B)
+using BenchmarkTools
 
-@time matmul_tturbo!(C, A, B)
+@btime matmul_serial!($C, $A, $B)
+
+@btime matmul_tturbo!($C, $A, $B)
 ```
 and with 4 julia threads (`julia -t 4`).
 
 What do you observe?
-
-Hint: Repeat the measurements. What happens the first time? Is it faster? If so, how much faster?
-
 
 <details>
 	<summary>Conclusion</summary>
