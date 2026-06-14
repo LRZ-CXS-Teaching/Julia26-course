@@ -31,9 +31,9 @@ We can re-express that in terms of *speed-up*: $S_N = T_1 / T_N$ (How much faste
 ```math
 S_N = \frac{1}{(1-p)+p/N}\;,
 ```
-or, as a parallel efficiency $\varepsilon_N$ (in comparison to ideal scaling) by
+or, as a *parallel efficiency* $\varepsilon_N$ (in comparison to ideal scaling) by
 ```math
-\varepsilon_N = \frac{T_1/N}{T_N}=\frac{1}{N(1-p)+p}\;.
+\varepsilon_N = \frac{T_1/N}{T_N}=\frac{1}{N(1-p)+p}\;\quad(0\le\varepsilon_N\le1).
 ```
 This is [*Amdahl's Law*](https://en.wikipedia.org/wiki/Amdahl%27s_law). The essence is that with this simple model, we can make simple assessments about possible speed-up gains from simple scaling experiments - even if this model does not incorporate things like IO or communication (or, generally, parallelization) overhead. It is usually a good idea to have such a model in mind to gauge expectations about the code to be parallelized, to judge about performance issues, and to plan parallel HPC jobs (runtime estimation, CPU/GPU budget planning, etc.).
 
