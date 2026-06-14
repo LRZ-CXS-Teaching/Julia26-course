@@ -322,3 +322,30 @@ module load julia                         # make julia executable available
 julia pathtrace_distributed_PPM.jl
 ```
 That script was submitted just via `sbatch pathtrace_distributed_PPM.slurm`.
+
+
+## Profiling (tutorial)
+
+In order to profile some program, it is easiest (imho) to store it in a file - say "pathtrace.jl", and to use it as follows in a profiling session. So, start the REPL.
+```
+julia> using Profile, PProf            # possibly install before
+
+julia> include("pathtrace.jl")         # does nothin, yet
+
+julia> render()                        # runs code once, possibly compiles things
+
+julia> @profile render()               # takes a profile
+
+julia> Profile.print()                 # gives out a lot of information, function call frequencies
+
+julia> Profile.clear()                 # clear the profile cache
+
+julia> @profile_walltime render()      # take a profile, this time the walltimes
+
+julia> pprof()                         # opens a window with flame graph
+```
+Check out also the [`Profile` docu](https://docs.julialang.org/en/v1/manual/profile/) on usage and interpretation. But most things are actually quite intuitive. (pprof needs to be installed. But a browser can also be used instead.)
+
+Look for what takes longest to run. Next, check why it takes so long. Last, try to reduce this runtime (possibly in an isolated environment - check type stability of that function, etc.).
+
+[Youtube: "[08x02] Julia Performance Tips and Tools | How to use @time, @profile, @profview, @profview_allocs"](https://www.youtube.com/watch?v=gzvn-hdlkUg)
