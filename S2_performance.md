@@ -319,7 +319,7 @@ Let's look at the following function (example is taken from Kwong).
 ```julia
 random_data(n) = isodd(n) ? rand(Int, n) : rand(Float64, n)
 ```
-Yes! This works in julia! Types are first citizens in Julia. try that
+Yes! This works in julia! Types are first class citizens in Julia. Let's try that.
 ```julia
 a = rand(Float64,10)
 a_type = typeof(a)
