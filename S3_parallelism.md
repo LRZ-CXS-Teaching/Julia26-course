@@ -504,7 +504,7 @@ So, what can we do with it? We need to bring workload to the worker, where it ru
 julia> myid()                        # get the worker ID
 1
 
-julia> a = @spawnat 2 myid();        # get the worker ID from the worker
+julia> a = @spawnat 2 myid();        # get the worker ID from a worker, myid() is spawned to worker 2
 
 julia> r = fetch(a)                  # when result available, show us
 2
