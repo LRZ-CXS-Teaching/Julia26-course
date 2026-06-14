@@ -226,7 +226,7 @@ println("VTK export finished! Open 'swift_hohenberg_sparse_vtk/hexagons_sparse.p
 It can be executed via `julia shg.jl`, if all required modules are already installed.
 
 > [!WARNING]
-> **Rules for Optimization**
+> **Disclaimer**
 > One should not try to thread-parallelize this code! The solver uses internally `LinearAlgebra`.
 > And so, we can apply `BLAS` parallelization (`OMP_NUM_THREADS=4 julia shg.jl`).
 
