@@ -657,9 +657,9 @@ end
 u_final = Array(u_old)
 println("final state (part):   ", round.(u_final[38:62], digits=2))
 ```
-`@sync` cares for a barrier such that the loop must be finished before any worker can go on. `@async` simply means non-blocking execution of the `remotecall_fetch` on the master in the loops. That's the reason for the outer `@sync`.
+`@sync` cares for a barrier such that the loop must be finished before any worker can go on. `@async` simply means that `remotecall_fetch` is executed in a non-blocking fashion on the master. Therefore, the `@sync` is required for the loop - to wait for the returning of each `remotecall_fetch` call.
 
-The final fetch of an array is debatable in HPC circumstances. Usually, it is more clever to write out results to a file in a worker-local fashion in order to avoid memory overrun on the node of the master.
+The final fetch of an array is debatable in HPC circumstances. Usually, it is more clever to write out results to a file in a worker-local fashion in order to avoid memory overrun on the node of the master, and also to parallelize the IO (it's faster).
 
 Instead of `@sync/@async`, which is rather convenient, you can but also do the same thing with `@spawnat` (`@spawn`, if you don't care which worker is used - the runtime system schedules) and `fetch()`. But then, explicit data movement/handling is also your business. 
 </details>
