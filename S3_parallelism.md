@@ -274,7 +274,14 @@ What do you observe?
 <details>
 	<summary>Conclusion</summary>
 
-Maybe better use `LinearAlgebra` for that ... `C = A * B`. ;) (Yes. That's also threaded, if you want, and really optimized ... see below.)
+Also try
+```julia
+using LinearAlgebra
+
+@btime C .= A * B
+```
+
+Maybe better use `LinearAlgebra` for that ... `C .= A * B`. ;) (Yes. That's also threaded, if you want, and really optimized ... see below.)
 
 Btw. here a small script how scaling tests could be done. There is unfortunately no way to set the number of threads from inside a julia script.
 ```julia
