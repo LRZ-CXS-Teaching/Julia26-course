@@ -406,7 +406,7 @@ ERROR: LoadError: ArgumentError: nested outer loops are not currently supported 
 
 The probably most reasonable way is to merge the loops into one single loop.
 ```julia
-@threads for idx in CartesianIndices((1:3, 1:2))
+@threads for idx in CartesianIndices((1:5, 1:5))
     i = idx[1]
     j = idx[2]
     println("Thread $(threadid()) processing i=$i, j=$j")
@@ -431,16 +431,16 @@ Hello from 5
 Hello from 4
 Hello from 3
 ```
-There's really a lot of freedom and flexibility. But that comes at a price. If threads share common data structures, synchronization like *locks* are required in order to prevent data-races. And locks in turn are prone to dead-locks. That's specific to threads! Not to julia.
+There's really a lot of freedom and flexibility. But that comes at a price. If threads share common data structures, synchronization like *locks* are required in order to prevent data-races. And locks in turn are prone to dead-locks. That's specific to threads! Not to Julia.
 
 <br>
 
-Furthermore, packages like [`LinearAlgebra`](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/) (OpenBLAS) and [`MKL`](https://github.com/JuliaLinearAlgebra/MKL.jl) provide own OpenMP thread control. That's somewhat external to julia, i.e. there are no julia threads used. Thread-nesting is not forbidden, but a little dangerous. It requires some care not to over-commit on the given hardware. A sure symptome of such is a vast performance loss (up to even system hang-up).
-Use `BLAS.set_num_threads(1)` to set the required number of threads for the BLAS workflows. (Environment variables like `OPENBLAS_NUM_THREADS` and `MKL_NUM_THREADS`, respectively, or more general, `OMP_NUM_THREADS`, can also be used.)
+Furthermore, packages like [`LinearAlgebra`](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/) (OpenBLAS) and [`MKL`](https://github.com/JuliaLinearAlgebra/MKL.jl) provide own OpenMP thread control. That's somewhat external to julia, i.e. there are no julia threads used. Thread-nesting is not forbidden, but merely a little dangerous. It requires some care not to overcommit on a given hardware. A sure symptom of overcommitment is a vast loss of performance (up to even system hang-up).
+Use `BLAS.set_num_threads(1)` to set the required number of threads for the BLAS workflows. Environment variables like `OPENBLAS_NUM_THREADS` and `MKL_NUM_THREADS`, respectively, or more general, `OMP_NUM_THREADS`, can also be used.
 
-That's not of an issue if you run your julia programs serially. Then you can use all CPUs avaiable for the linear algebra stuff.
+That's not of an issue if you run your julia programs serially - `julia -t 1`. Then you can use all CPUs avaiable for the linear algebra stuff.
 
-To get some feeling for it, play a bit with
+To get some feeling for it, play a bit with the following.
 ```julia
 julia> using LinearAlgebra
 
@@ -451,7 +451,7 @@ julia> b = rand(Float64,100);
 julia> x = A\b
 ...
 ```
-and the `BenchmarkTools`.
+and benchmark (`BenchmarkTools`).
 
 #### Final Remark
 Another often seen package for loop parallelization is [`FLoops`](https://github.com/JuliaFolds/FLoops.jl). It extends `Threads` in some ways. But follows otherwise the same semantics.
