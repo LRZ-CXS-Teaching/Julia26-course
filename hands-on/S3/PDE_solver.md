@@ -26,6 +26,9 @@ x_0 \\ y_0
 \end{pmatrix}
 ```
 How can one solve it in Julia?
+<details>
+    <summary>source code</summary>
+
 ```julia
 using DifferentialEquations, Plots
 
@@ -70,6 +73,8 @@ ylabel!("predator (y)")
 # both plots in one
 plot(p1, p2, layout=(1, 2), size=(900, 400))
 ```
+</details>
+
 
 ## PDE Example (showcase)
 One can also solve partial different equations (PDE) with this method.
