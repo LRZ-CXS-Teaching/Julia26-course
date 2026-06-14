@@ -324,7 +324,7 @@ Yes! This works in julia! Types are first class citizens in Julia. Let's try tha
 a = rand(Float64,10)
 a_type = typeof(a)
 if a_type <: AbstractArray{Float64, 1}
-   println("AbstractArray{Float64, 1}")                 # synonme for some real code that executes
+   println("AbstractArray{Float64, 1}")                 # synonym for some real code that executes here
 else
    println("not a AbstractArray{Float64, 1}")
 end
