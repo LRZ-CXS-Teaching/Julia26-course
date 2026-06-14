@@ -11,7 +11,8 @@ x \\ y
 \end{pmatrix}
 =
 \begin{pmatrix}
-\alpha x - \beta xy \\ -\gamma y + \delta xy  
+\alpha x - \beta xy \\
+\delta xy -\gamma y  
 \end{pmatrix}
 \;,\qquad
 u(t=0) = u_0 = 
