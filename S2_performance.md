@@ -134,6 +134,40 @@ Body::Int64
 In C++, this is called *const-correctnes*. It's probably a good idea to adhere to it. Judging code becomes not only easier for a compiler then, but also for other programmers reading this code.
 In many cases, with this little information extra, compilers really can do some sort of magic in terms of code reduction during compilation - the maximum of performance optimization: "The fastest code is that one which doesn't need to execute at all." (the compiler can calculate things, too, and replaces the result immediately in the code, for instance).
 
+### Beware of Temporaries
+Let's look at the following innocously looking code.
+```julia
+function naiv_addieren(B, C, iterationen)
+    A = zeros(size(B))
+    for _ in 1:iterationen
+        A = B + C                   # allocates each time anew
+    end
+    return A
+end
+```
+Let's compare that with
+```julia
+function inplace_addieren(B, C, iterationen)
+    A = zeros(size(B))
+    for _ in 1:iterationen
+        A .= B .+ C                 # 0 allocations, overwrite in-place
+    end
+    return A
+end
+```
+Let's measure that using `BenchmarkTools`.
+```julia
+julia> B = rand(2000, 2000); C = rand(2000, 2000);
+
+julia> @btime naiv_addieren($B, $C, 100);
+  870.332 ms (303 allocations: 3.01 GiB)
+
+julia> @btime inplace_addieren($B, $C, 100);
+  655.145 ms (3 allocations: 30.52 MiB)
+```
+You may ask, what's the matter. Well, at some time, the Julia garbage collector is triggered. And this may *really* take some time to clean out all the temporaries.
+
+In order to identify such problems, one can use `Profile` (together with `PProf`). If you find a time-dominant `wait()` in front of some "*gc_collect()" function, you face exactly this issue. 
 
 ### Struct of Arrays Pattern
 Often, it's preferred to create a stucture like the following for convenience (we think in such structures).
