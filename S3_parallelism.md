@@ -789,7 +789,7 @@ Some technical detail. For using an installed system MPI, it is usually best to 
 using MPIPreferences
 MPIPreferences.use_system_binary()
 ```
-*Disclaimer* (though): MPI environments are quite special on HPC systems. And even more so is the integration into the resource manager and scheduler (e.g. Slurm). As in Julia, users install their modules on their own, it is also in their responsibility to correctly attach these to the environment. (For GPUs, it's the same.) But in case of issues, it is fair to simply contact the user support.
+*Disclaimer* (though): MPI environments are quite special on HPC systems. And even more so is the integration into the resource manager and scheduler (e.g. Slurm). As in Julia, users install their modules on their own, it is also in their responsibility to correctly attach these to the environment. (For GPUs, it's the same.) But in case of issues, it is fair to simply contact the user-support.
 
 Otherwise, just installing `MPI`, julia will provide a MPICH implemenation that you can also easily access. Just enter in the REPL
 ```julia
@@ -801,6 +801,13 @@ This creates a thin wrapper script, `~/.julia/bin/mpiexecjl`, where you afterwar
 > export PATH=~/.julia/bin:$PATH           # (place it into your ~/.bashrc or so, to make it permanent)
 > mpiexecjl -n 4 julia -- ./MPI-hello.jl   # output as above
 ```
+#### A HPC relevant Issue of MPI
+If you go massively parallel, Julia's complete setup might kill any success. If 1000+ ranks try to load some module at the same time, and note that it still needs to be precompiled, and then all start to fight for write locks, etc., or the package are pre-compiled already, but they are huge in the file system, the start-up process might vastly take time. 
+
+A work around is to let only rank 0 load the modules first. The other ranks wait in a barrier. Once ready, and rank 0 passes this barrier, too, the other ranks only need to load-read the modules.
+
+Already the pre-compilation itself - even if only serially - can take quite some while. It is probably quite a waste of time to perform it during a production job with possibly thousands of CPUs that idle then.
+There are packages to ahead-of-time (AOT) compile complete programs. See, for instance, [`PackageCompiler`](https://julialang.github.io/PackageCompiler.jl/dev/).
 
 ## Hands-on
 
