@@ -350,3 +350,8 @@ Check out also the [`Profile` docu](https://docs.julialang.org/en/v1/manual/prof
 Look for what takes longest to run. Next, check why it takes so long. Last, try to reduce this runtime (possibly in an isolated environment - check type stability of that function, etc.).
 
 [Youtube: "[08x02] Julia Performance Tips and Tools | How to use @time, @profile, @profview, @profview_allocs"](https://www.youtube.com/watch?v=gzvn-hdlkUg)
+
+If you do that for the original "pathtrace.jl" (`render()`), you'll notice that the program *waits* a lot. In the profile, you then see that this wait is triggered by the julia garbage collector. "stop-the-world" break. This means that we produce quite a lot of temporaries somewhere. Can you figure out, where?
+
+Possible solutions: Use/reuse preallocated arrays and data structures, if possible. Use `StaticArrays`. And, of course, check type stability!
+
