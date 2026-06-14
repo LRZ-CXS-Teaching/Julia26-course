@@ -342,7 +342,8 @@ julia> Profile.clear()                 # clear the profile cache
 
 julia> @profile_walltime render()      # take a profile, this time the walltimes
 
-julia> pprof()                         # opens a window with flame graph
+julia> pprof()                         # opens a window, or a server for the browser,
+                                       # and saves the profile in "profile.pb.gz" which can be opened with pprof() later again
 ```
 Check out also the [`Profile` docu](https://docs.julialang.org/en/v1/manual/profile/) on usage and interpretation. But most things are actually quite intuitive. (pprof needs to be installed. But a browser can also be used instead.)
 
