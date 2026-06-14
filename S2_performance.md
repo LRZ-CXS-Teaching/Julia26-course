@@ -66,7 +66,7 @@ Let's now benchmark both functions.
 julia> using BenchmarkTools
 
 julia> @btime f(5);
-  19.113 ns (0 allocations: 0 bytes)
+  19.113 ns (0 allocations: 0 bytes)        # <-- !!
 
 julia> @btime g(5,$var);                    # remember: variable interpolation in macros
   2.154 ns (0 allocations: 0 bytes)
