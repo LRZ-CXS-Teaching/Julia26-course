@@ -465,10 +465,10 @@ For one, you can start Julia also with the option `-p/--procs <number>`. It auto
 > julia -p 2
 ...
 
-julia> nworkers()
+julia> nworkers()                     # number of workers
 2
 
-julia> workers()
+julia> workers()                      # list of worker IDs
 2-element Vector{Int64}:
  2
  3
