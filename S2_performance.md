@@ -187,7 +187,7 @@ data = [Particle3D(rand(), rand(), rand()) for _ in 1:N]
 In a MD simulation, one maybe needs to calculate the compute the respective distances. For simplicity of illustration, let's "only" determine the center-of-gravity (CoG) of the particle cloud.
 ```julia
 function compute_center_of_gravity(particles)
-    x², y², z² = (0, 0, 0)
+    x², y², z² = [0., 0, 0]
     for i in eachindex(particles)
         @inbounds p = particles[i]     # no boundary checks
         x² += p.x^2
