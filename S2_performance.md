@@ -8,7 +8,7 @@
 > * Optimize ONLY performance critical sections of code! ([20/80 rule](https://en.wikipedia.org/wiki/Pareto_principle))
 > * First: CORRECT!!!   Second: Efficient! ([TDD](https://en.wikipedia.org/wiki/Test-driven_development))
 
-Modern hardware is really complex (both CPUs and GPUs). Compilers and hardware use already quite some heuristics to analyze program flow and memory access patterns in order to optimally perform on the hardware, and to support programmers. However, nothing of that can work magic, either. And both are obliged to keep the `correct` semantics, primarily.
+Modern hardware is really complex (both CPUs and GPUs). Compilers and hardware use already quite some heuristics to analyze program flow and memory access patterns in order to optimally perform on the hardware, and to support programmers. However, nothing of that can work magic, either. And the hardware obliged (designed) to keep the `correct` semantics, primarily.
 
 Julia is a strongly typed and natively to the hardware compiled language as is e.g. C/C++/Fortran. But Julia also supports programmers by adherence to certain programming styles and patterns, which need to be imposed explicitly in other programming languages (see e.g. Core Guidelines for C++). But still, as is valid for C/C++:
 
