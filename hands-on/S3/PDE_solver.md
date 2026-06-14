@@ -75,6 +75,9 @@ plot(p1, p2, layout=(1, 2), size=(900, 400))
 ```
 </details>
 
+<div align="center">
+  <img src="lotka-volterra.png" width="900" alt="Lotka-Volterra Model">
+</div>
 
 ## PDE Example (showcase)
 One can also solve partial different equations (PDE) with this method.
