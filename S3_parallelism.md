@@ -566,7 +566,9 @@ julia> @everywhere @show locale_daten
 ERROR: On worker 2:
 UndefVarError: `locale_daten` not defined in `Main`
 ```
-Conclusion: Workers are independent julia instances (processes) that communicate with each other through functions. And data must be handled/send manually.
+So, we moved data to worker two, did some computation, and got the result. There are no data on worker 2 remaining, though.
+
+Conclusion: Workers need to be considered as independent Julia instances (processes) that communicate with each other through functions. Data management must be done manually.
 
 Depending on you workflows, you can send data with function, or "allocate" data on the workers (via `@spawnat` or `@everywhere`). There are modules like [`SharedArrays`](https://docs.julialang.org/en/v1/stdlib/SharedArrays/) (on single machine) and [`DistributedArray`](https://juliaparallel.org/DistributedArrays.jl/stable/) (across several machines).
 
