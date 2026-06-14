@@ -113,7 +113,7 @@ const L = 80.0
 const x = range(0.0, L, length=N+1)[1:N]
 const y = x
 const dx = L / N
-const ϵ = 0.2                       #  0.2 -> heaxons; ϵ > 1.33 -> stripes 
+const ϵ = 0.2                       #  0.2 -> heaxons; 1.4 -> stripes 
 p = (N, dx, ϵ)
 
 # --- helper to map 2D grid indices (i,j) to 1D vector index ---
@@ -223,3 +223,17 @@ println("VTK export finished! Open 'swift_hohenberg_sparse_vtk/hexagons_sparse.p
 ```
 </details>
 
+It can be executed via `julia shg.jl`, if all required modules are already installed.
+
+> [!WARNING]
+> **Rules for Optimization**
+> One should not try to thread-parallelize this code! The solver uses internally `LinearAlgebra`.
+> And so, we can apply `BLAS` parallelization (`OMP_NUM_THREADS=4 julia shg.jl`).
+
+Don't be too disappointed. The speed-up gain is rather small. The system is too small to really put much workload on more than two threads.
+
+The major performance gain did we already obtain by pre-/describing the sparsity pattern of the Jacobian used (in CSC format) by the implicit ODE solver.
+
+<div align="center">
+  <img src="shg.png" width="800" alt="Swift-Hohenberg">
+</div>
