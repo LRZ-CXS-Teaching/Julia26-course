@@ -513,7 +513,7 @@ We executed the function `myid`, which returns the worker ID, on worker 2. The "
 (Careful!! Removing and adding processes/workers might be confusing. The worker IDs once used are never reused. Better avoid this jumble!)
 
 To do something useful, one usually defines some function that is then spawned to some or all workers (or so). Much like `myid()` above. But doing so naively like here,
-```shell
+```julia
 > julia -p 1                          # one additional worker
 ...
 julia> g(x) = x^2;
@@ -526,7 +526,7 @@ UndefVarError: `#g` not defined in `Main`
 ...
 ```
 awfully fails. What happened is that `g` is not known on worker 2. We first must declare it there. So, once again, and this time correctly.
-```shell
+```julia
 > julia -p 1
 ...
 julia> @everywhere g(x) = x^2;        # do that on all workers
