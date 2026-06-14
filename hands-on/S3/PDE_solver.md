@@ -1,8 +1,9 @@
 # Solving PDEs computationally (Tutorial)
 
 ## Introduction
-Please look into the documentation of [`DifferentialEquations`](https://docs.sciml.ai/DiffEqDocs/stable/). There tutorials and examples. I guess, one cannot do better.
+Please look into the documentation of [`DifferentialEquations`](https://docs.sciml.ai/DiffEqDocs/stable/). There are many tutorials and examples. I guess, one cannot do better.
 
+## Simple ODE Example (show case)
 The simplest ODE standard example with still quite some complexit is probably the Lotka-Volterra model (for predator-prey-relationship).
 ```math
 \dot{u}(t) = \frac{d}{dt}
@@ -69,3 +70,6 @@ ylabel!("predator (y)")
 # both plots in one
 plot(p1, p2, layout=(1, 2), size=(900, 400))
 ```
+
+## PDE Example (showcase)
+One can also solve partial different equations (PDE) with this method.
