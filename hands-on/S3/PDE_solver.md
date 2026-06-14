@@ -234,6 +234,8 @@ Don't be too disappointed. The speed-up gain is rather small. The system is too 
 
 The major performance gain did we already obtain by pre-/describing the sparsity pattern of the Jacobian used (in CSC format) by the implicit ODE solver.
 
+Furthermore, the solution time is anyway on the order of 2-3 minutes. It wasn't always so easy in the past!
+
 <div align="center">
   <img src="shg.png" width="800" alt="Swift-Hohenberg">
 </div>
