@@ -10,7 +10,8 @@
 
 Modern hardware is really complex (both CPUs and GPUs). Compilers and hardware use already quite some heuristics to analyze program flow and memory access patterns in order to optimally perform on the hardware, and to support programmers. However, nothing of that can work magic, either. And the hardware obliged (designed) to keep the `correct` semantics, primarily.
 
-Julia is a strongly typed and natively to the hardware compiled language as is e.g. C/C++/Fortran. But Julia also supports programmers by adherence to certain programming styles and patterns, which need to be imposed explicitly in other programming languages (see e.g. Core Guidelines for C++). But still, as is valid for C/C++:
+Julia is a strongly typed and natively to the hardware compiled language as is e.g. C/C++/Fortran. But Julia does that "just-in-time" - You write a code, Julia compiles it. You execute a Julia script, Julia compiles it. 
+Julia supports programmers by adherence to certain programming styles and patterns, which need to be imposed explicitly in other programming languages (see e.g. Core Guidelines for C++). But still, as is valid for C/C++:
 
 > [!WARNING]
 > **Disclaimer**
