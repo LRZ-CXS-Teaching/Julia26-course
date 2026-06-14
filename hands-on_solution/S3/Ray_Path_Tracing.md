@@ -558,7 +558,7 @@ render()
 ```
 </details>
 
-These are the demanding render settings - high resolution, large MC sample size, ray bounce depth - as we used before for the 35 minutes on 80 threads test case.
-It executes now serially (!! without threads) in 18 minutes. And on 80 threads in less than 8 minutes.
+These are the demanding render settings - high resolution, large MC sample size, ray bounce depth - as we used **before** for the **35 minutes on 80 threads** test case.
+It executes **now** serially (!! without threads) in 18 minutes. And **on 80 threads in less than 8 minutes**.
 
-**"Julia does not guaramtee you performance!. Only *control* over performance!"**
+**"Julia does not guarantee you performance! Only *control* over performance!"**
