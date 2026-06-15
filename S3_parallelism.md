@@ -482,8 +482,9 @@ plot(p1, p2, layout = (1, 2), size = (800, 400))
 
 savefig("scaling_plot.pdf")
 ```
+As a script, it should be executed as `JULIA_EXCLUSIVE=1 julia -t 8 scaling.jl`.
 
-A result may look as follows.
+A result may look like the following figure.
 
 <div align="center">
   <img src="miscellanea/images/scaling_plot.png" width="800" alt="scaling plot">
