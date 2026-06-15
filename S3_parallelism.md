@@ -543,6 +543,15 @@ It is possible to spawn and join threads arbitrarily. Here is an example of expl
 julia> Threads.nthreads()
 4
 
+julia> f(x) = x^2
+f (generic function with 1 method)
+
+julia> t₅ = Threads.@spawn f(5)
+Task (runnable, started) @0x00007f9104fd82e0
+
+julia> a = fetch(t₅)
+25
+
 julia> t() = println("Hello from ", Threads.threadid());
 
 julia> tasks = fetch.([Threads.@spawn t() for i in 1:Threads.nthreads()]);
