@@ -7,6 +7,9 @@
   - [Working with GPU arrays](#working-with-gpu-arrays)
   - [Kernels, i.e. where broadcasting breaks down](#kernels-ie-where-broadcasting-breaks-down)
   - [KernelAbstractions.jl](#kernelabstractionsjl)
+    - [REPL intro to KernelAbstractions.jl](#repl-intro-to-kernelabstractionsjl)
+    - [Basic KA example](#basic-ka-example)
+    - [A more complicated KA example](#a-more-complicated-ka-example)
 
 
 <br>
@@ -58,12 +61,13 @@ dev = DevLibrary.device()               # current GPU device selected
 InteractiveUtils.methodswith(typeof(dev),DevLibrary)        # which methods are available for this device?
 
 # CUDA specifics
+CUDA.functional()                       # if this works, you're good to go!
 CUDA.name(dev)                          # e.g. "Tesla V100-PCIE-16GB"
 CUDA.capability(dev)                    # compute capability, e.g. v"7.0.0"
 
 CUDA.total_memory() / 1024^3            # total device VRAM (in bytes)
 CUDA.free_memory() / 1024^3             # free device VRAM (in bytes)
-CUDA.cache_memory() / 1024^3            # cached device VRAM (in bytes): available but previosly used
+CUDA.cached_memory() / 1024^3            # cached device VRAM (in bytes): available but previosly used
 CUDA.used_memory() / 1024^3             # used device VRAM (in bytes)
 
 # Behind the scenes, a memory pool will hold on to your objects and cache the underlying memory to speed up future allocations
@@ -79,19 +83,28 @@ Example of memory management in CUDA:
 CUDA.pool_status()                  # initial state
     # Effective GPU memory usage: 1.92% (309.938 MiB/15.766 GiB)
     # Memory pool usage: 0 bytes (0 bytes reserved)
-a = CuArray{Int}(undef, 1024);      # allocate 8KB
-CUDA.pool_status()
+a = CuArray{Int}(undef, 1024); CUDA.pool_status()     # allocate 8KB
     # Effective GPU memory usage: 2.12% (341.938 MiB/15.766 GiB)
-    # Memory pool usage: 16.000 KiB (32.000 MiB reserved)
-a = nothing; GC.gc(true)
-CUDA.pool_status()
+    # Memory pool usage: 8.000 KiB (32.000 MiB reserved)        # 32MB are preallocated by the GPU as buffer
+a = nothing; GC.gc(true); CUDA.pool_status()
     # Effective GPU memory usage: 2.12% (341.938 MiB/15.766 GiB)
-    # Memory pool usage: 0 bytes (32.000 MiB reserved)
+    # Memory pool usage: 0 bytes (32.000 MiB reserved)    
 CUDA.reclaim()          # if for some reason you need all cached memory to be reclaimed
 CUDA.pool_status()
     # Effective GPU memory usage: 1.92% (309.938 MiB/15.766 GiB)
     # Memory pool usage: 0 bytes (0 bytes reserved)
 # GPU memory is scarce + GC is less predictable than CPU => sometimes you need manual intervention
+
+# regarding the pre-allocation that CUDA does:
+a = CUDA.zeros(Int64, 4*1024*1024); CUDA.pool_status()
+    # Effective GPU memory usage: 2.12% (341.938 MiB/15.766 GiB)
+    # Memory pool usage: 32.000 MiB (32.000 MiB reserved)
+a = nothing; GC.gc(); CUDA.reclaim(); CUDA.pool_status()
+    # Effective GPU memory usage: 1.92% (309.938 MiB/15.766 GiB)
+    # Memory pool usage: 0 bytes (0 bytes reserved)
+a = CUDA.zeros(Int64,1+ 4*1024*1024); CUDA.pool_status()
+    # Effective GPU memory usage: 2.32% (373.938 MiB/15.766 GiB)
+    # Memory pool usage: 32.000 MiB (64.000 MiB reserved)       # now is 64!
 
 # NOTE: cuarrays are managed by Julia garbage collector
 # => they will be collected once they are unreachable, and their memory will be freed
@@ -211,7 +224,6 @@ B = DevLibrary.rand(Float32, 1024, 1024);
 C = A * B                           # dispatches to e.g. CUBLAS dgemm automatically
 @test all(C .≈ A*B)
 
-v = CUDA.eigvals(A)                 # cuSOLVER — same function name as CPU
 # No code change needed wrt CPU, Julia's multiple dispatch selects the GPU BLAS backend based on array type
 
 
@@ -262,8 +274,8 @@ x_gpu = DevLibrary.rand(2^16);
 DevLibrary.@sync @time sum(x_gpu .* 2)
 
 # or, with BenchmarkTools:
-@btime DevLibrary.@sync sum($x_gpu)
-@btime sum($Array(x_gpu))
+@btime DevLibrary.@sync sum($x_gpu .*2 )
+@btime sum($Array(x_gpu) .*2 )
 # speedup: GPU wins with large N (i.e. when code is compute-bound)
 ```
 
@@ -368,12 +380,69 @@ Big issue: codes like that are not portable due to terminology differences!
 
 ## KernelAbstractions.jl
 
+
+<br>
+<br>
+
+
+### REPL intro to KernelAbstractions.jl
+
+Before writing kernels, `KernelAbstractions` provides backend-agnostic helpers
+for allocation and data transfer — no kernel required:
+
+```julia
+using KernelAbstractions
+const KA = KernelAbstractions
+using CUDA
+const backend = CUDA.CUDABackend()
+
+# NOTE: KA brings also the CPU() backend!
+KA.allocate(CPU(), Float32, 8)          # perfect to test stuff
+
+# --- allocation ---
+a = KA.allocate(backend, Float32, 8)    # uninitialized device array (like undef)
+b = KA.zeros(backend, Float32, 8)       # zero-filled device array
+c = KA.ones(backend, Float32, (4, 4))   # ones, works with tuple shapes too
+
+
+# --- transfer CPU -> device and back ---
+# RAND NOT IMPLEMENTED! => we can use the CPU one and copy to GPU
+cpu = rand(Float32, 8)
+d = KA.allocate(backend, Float32, 8)
+copyto!(d, cpu)                 # in-place copy; device array must already exist
+# one-liner alternative: allocate + copy in one shot
+copyto!(KA.allocate(backend, Float32, 8), rand(Float32, 8))
+# OR, use the device library explicitly
+CUDA.rand(Float32, 8)            # HERE THERE IS NOT DATA TRANSFER (but is not pure KA.jl)
+# to transfer back from device to host
+b_cpu = Array(b)                 # always works regardless of backend
+
+
+# --- inspect: KA can query the backend of any array ---
+KA.get_backend(b)        # CUDABackend() — works for CuArray, ROCArray, MtlArray, etc.
+
+# --- synchronize (flush all pending kernel/copy ops) ---
+KA.synchronize(backend)
+```
+
+> `KA.allocate`, `KA.zeros`, `KA.ones` mirror `CUDA.CuArray(undef,...)`, `CUDA.zeros`, `CUDA.ones`
+> but are **backend-agnostic**: swap `backend` and the rest of the code stays identical!
+
+<br>
+<br>
+<br>
+
+
+
+
+### Basic KA example
+
+
 **IMPORTANT**: to be manually chosen:
 
 * WorkGroup (Thread Block) size, i.e. #threads in each TB; must be a power of 2, recommended `32` (or 64)
 * DRange (Grid) size, i.e. total #threads to be spawned; set to your problem size (e.g. vector length)
 
-<br>
 <br>
 
 
@@ -439,7 +508,6 @@ x_cpu, y_cpu, z_cpu = Array(x), Array(y), Array(z)   # download after kernel
 ```
 
 <br>
-<br>
 
 Regarding the name equivalence between KernelAbstractions.jl and CUDA:
 
@@ -459,14 +527,19 @@ Regarding the name equivalence between KernelAbstractions.jl and CUDA:
 Note: in CUDA C++ `threadIdx`, `blockIdx`, `blockDim` are **built-in structs** (no parentheses), 
 while in CUDA.jl they are **functions** returning a struct — hence `threadIdx().x` with `()`.
 
+<br>
+<br>
 
-A more complicated KA example:
+
+
+
+### A more complicated KA example
 
 ```julia
 using Test, KernelAbstractions
 using CUDA
 const backend = CUDA.CUDABackend()
-const DevLibrary = CUDA            
+const DevLibrary = CUDA
 const DevArray = CUDA.CuArray
 const DevFloat = Float32
 

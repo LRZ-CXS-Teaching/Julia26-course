@@ -439,6 +439,7 @@ using KahanSummation
 sum_kbn(t)      # 1e-100
 
 
+
 # ------------------------------------------------------------------------------------------
 # Deep dive into equality operators
 # ------------------------------------------------------------------------------------------
@@ -492,15 +493,18 @@ isa(1, Number)              # whether x is of the given concrete type or its sup
 2.0 isa Float64             # same as above 
 Float64 <: Number           # whether x is subtype of y
 
+
 # methods and dispatch
 methods(sin)                # all methods for a generic function
 @which sizeof               # in which module this input is defined?
 @which sum([1, 2, 3])       # exact method selected by dispatch
 
+
 # fields
 fieldnames(typeof(1//2))            # fields of input object type (":num, :den")
 getfield(1//2, :num)                # get ":num" field from input oject
 setfield!(x, :num, 5)               # ERROR: immutable struct of type Rational cannot be changed
+
 
 # size
 sizeof(3)                                   # size, in bytes, of the canonical binary representation of the given
@@ -508,12 +512,14 @@ Base.summarysize([1, 2, 3])                 # amount of memory, in bytes, used b
 # see the difference with following example
 sizeof(Ref(rand(100))), Base.summarysize(Ref(rand(100)))
 
+
 # references
 v = [1,2,3]
 r = Ref(v)              # "Base.RefValue{Vector{Int64}}([1, 2, 3])"
 r[]                     # getting a value from a Ref, i.e. "[1, 2, 3]"
 r[][2] = 7              # storing a new value in a Ref
 r[]                     # "[1,7,3]"
+
 
 # reassignments to scalars makes REBINDING (scalars are immutables)
 x = 1; objectid(x)      # label "x" points to "1"
@@ -525,6 +531,7 @@ v = [1, 2, 3]
 pointer(v)              # Ptr{Int64}(0x0000000112b73ef0)        # native memory address of the data
 pointer_from_objref(v)  # Ptr{Nothing}(0x0000000112281350)      # memory address of the Julia object reference itself (the header/metadata structure)
 
+
 # @locals expands to a dictionary-like structure containing all local variables currently visible in scope
 function f(x)
     y = x + 1
@@ -533,9 +540,24 @@ function f(x)
     return y+z
 end
 
+
 # infix operator |>, and native "ans" variable (stores previous result)
 4*5 |> sin |> tan
 ans |> x->x/3
+
+
+# const 
+# const in Julia fixes the binding, not the value!
+#     * You can't reassign a const-defined var to something else (or you get a warning/error)
+#     * BUT "constant-ness" does not extend into mutable containers => IF the value is mutable, you can still mutate it
+#     * compiler benefit: it can assume the type won't change, enabling optimization on globals
+const X = 42
+X = 43        # ERROR/WARNING: redefinition of constant X
+const A = [1,2,3]
+push!(A, 4)   # fine — mutating the value, not rebinding
+A = [5,6]     # ERROR/WARNING
+# => it's closer to "the name is permanently bound to this object" than to a C/C++ const
+
 
 # remove the three vertical dots from the output of a command
 show(stdout, MIME"text/plain"(), names(InteractiveUtils, all=true))
