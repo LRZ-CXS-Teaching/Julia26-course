@@ -117,9 +117,10 @@ plot(df.x,df.y,yerror=df.yerr, st = :scatter, markershape = :square, markercolor
 ```
 In a next step, define a model with some parameters, and let `LsqFit` do the minimization for you.
 ```julia
+@. model(x,a) = .... # TODO
 using LsqFit
-a0 = [0.,0.]      # so many parameters you have
-weights = 1.0 ./ (df.yerr .^ 2)
+a0 = [0.,0.]                                      # initial value for as many parameters your model has
+weights = 1.0 ./ (df.yerr .^ 2)                   # -> docu; just bear here with us
 fit = curve_fit(model, df.x, df.y, weights, a0)
 ```
 **Remark** `curve_fit` will require some weights based on the $\sigma_i$ (uncertainties). These are actually `weights[i]`$=1/\sigma_i^2$.
