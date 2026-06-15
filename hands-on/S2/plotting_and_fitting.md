@@ -215,7 +215,7 @@ chain = sample(posterior, NUTS(), 5000)
 stats = summarystats(chain)
 display(stats)
 
-# that's actually it ... rest is plotting
+# that's it actually ... rest is plotting
 
 # evaluate parameter's MCMC statistics
 using Statistics
