@@ -32,7 +32,7 @@ s = v₁ ⋅ v₂             # result: 10.0
 ### Exercise
 Repeat that for the cross-product.
 ```math
-v \times v = \begin{pmatrix}
+a \times b = \begin{pmatrix}
       a_yb_z - a_zb_y \\
       a_zb_x - a_xb_z \\
       a_xb_y - a_yb_x
