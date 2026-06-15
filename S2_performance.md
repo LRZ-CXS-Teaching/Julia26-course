@@ -389,7 +389,7 @@ Body::Union{Float64, Int64}
 4 ┄ %25 = total::Union{Float64, Int64}
 └──       return %25
 ```
-Julia needs to incorporate completely that different types can occur during runtime - depending on the input value function. And that for the full summation loop, too!
+Julia needs to incorporate completely that different types can occur during runtime - depending on the input value of the function. And that for the full summation loop, too!
 This prevents the JIT compiler from extra optimization.
 
 The "*barrier function pattern*" (Kwong calls it so) is meant to cope with this issue. Let's look how it works. We outsource the loop computation into another function, `double_sum`.
