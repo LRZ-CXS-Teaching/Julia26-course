@@ -56,89 +56,94 @@ julia> A = rand(1000);
 
 julia> B = rand(1000);
 
-julia> @code_native C = A .+ B
+julia> @code_native debuginfo=:none A .+ B
+...
 ...
 .LBB0_61:                               # %vector.body
                                         # =>This Inner Loop Header: Depth=1
-; │││││ @ simdloop.jl:77 within `macro expansion` @ broadcast.jl:995
-; │││││┌ @ broadcast.jl:616 within `getindex`
-; ││││││┌ @ broadcast.jl:620 within `_getindex`
-; │││││││┌ @ broadcast.jl:671 within `_broadcast_getindex`
-; ││││││││┌ @ broadcast.jl:695 within `_getindex`
-; │││││││││┌ @ broadcast.jl:665 within `_broadcast_getindex`
-; ││││││││││┌ @ essentials.jl:920 within `getindex`
 	vmovupd	ymm0, ymmword ptr [rcx + 8*r8]
 	vmovupd	ymm1, ymmword ptr [rcx + 8*r8 + 32]
 	vmovupd	ymm2, ymmword ptr [rcx + 8*r8 + 64]
 	vmovupd	ymm3, ymmword ptr [rcx + 8*r8 + 96]
-; ││││││││└└└
-; ││││││││ @ broadcast.jl:672 within `_broadcast_getindex`
-; ││││││││┌ @ broadcast.jl:699 within `_broadcast_getindex_evalf`
-; │││││││││┌ @ float.jl:495 within `+`
 	vaddpd	ymm0, ymm0, ymmword ptr [rdx + 8*r8]
 	vaddpd	ymm1, ymm1, ymmword ptr [rdx + 8*r8 + 32]
 	vaddpd	ymm2, ymm2, ymmword ptr [rdx + 8*r8 + 64]
 	vaddpd	ymm3, ymm3, ymmword ptr [rdx + 8*r8 + 96]
-; │││││└└└└└
-; │││││┌ @ array.jl:986 within `setindex!`
-; ││││││┌ @ array.jl:991 within `_setindex!`
 	vmovupd	ymmword ptr [rsi + 8*r8], ymm0
 	vmovupd	ymmword ptr [rsi + 8*r8 + 32], ymm1
 	vmovupd	ymmword ptr [rsi + 8*r8 + 64], ymm2
 	vmovupd	ymmword ptr [rsi + 8*r8 + 96], ymm3
-; │││││└└
-; │││││ @ simdloop.jl:78 within `macro expansion`
-; │││││┌ @ int.jl:87 within `+`
 ...
 ```
-This example is of course not very useful here. The element-wise addition of two arrays is already memory-bandwidth bound. One doesn't gain here much through vectorization, as the CPU mostly waits for the data from the memory/caches. The compiler here vectorizes only to ymm-registers (AVX2) instead of zmm-registers (AVX512), as it "knows" that. And vectorization comprises also some overhead which is larger for wider vector-registers.
+The compiler vectorizes only to ymm-registers (AVX2) instead of zmm-registers (AVX512). xmm = ymm/2, ymm=zmm/2. Using zmm registers, we could expect some speedup of two wrt. ymm register usage, and even a speedup factor of four wrt. xmm register usage.
+`vaddpd` is the vector add instruction for packed (that's important - we don't want "serial" ymm register usage) double values.
 
-However, some small thing might still enhance it. In `C = A .+ B`, the memory for `C` needs to be allocated before! This takes a little bit of time extra. If `C` already existed before (`C = similar(A)`), you should use
+Let's look at something simpler. Let's write a function that sums up all array elements.
 ```julia
-C .= A .+ B
+ function only_sum(A)
+           s = 0.0
+           for i in eachindex(A)
+               s += A[i]
+           end
+           s
+       end
 ```
-or, for better readability,
+Checking the assembly output, we obtain:
 ```julia
-@. C = A + B
-# or, even
-@inbounds @. C = A + B;
+julia> A = rand(1000);
+
+julia> @code_native debuginfo=:none only_sum(A)
+...
+.LBB0_6:                                # %L30
+                                        # =>This Inner Loop Header: Depth=1
+	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx]
+	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 8]
+	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 16]
+	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 24]
+	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 32]
+	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 40]
+	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 48]
+	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 56]
+...
 ```
-Julia understands this automatically to attach the dot on every operation (*broadcast fusion*). If `C` doesn't exist in memory before, you will get an error.
+xmm registers are half as wide as the ymm registers. Let's say, that's very moderate vectorization. The reason is not so clear. Careful compiler!
 
-Conclusion: We can mostly rely on LLVM here to give us a good-compromize performance. If not, work gets harder to figure out why loops aren't vectorized, and to make the compiler to rethink its decision. There are macros like `@simd`, and packages like [`SIMD`](https://github.com/eschnett/SIMD.jl) and [`LoopVectorization`](https://github.com/JuliaSIMD/LoopVectorization.jl) (`@turbo`). But eventually, one needs to really look into the compiled code to see whether vectorization was done. At the end, the compiler decides (similar as for inlining - `@inline`).
-
-For instance,
+Let's try something else.
 ```julia
 julia> A = rand(1000);
 
 julia> function simd_sum(A)
            s = 0.0
-           @simd for i in eachindex(A)
-               @inbounds s += A[i]
+           @simd for i in eachindex(A)                     # <- @simd
+               @inbounds s += A[i]                         # @inbound : don't check array bounds 
            end
            s
        end
 simd_sum (generic function with 1 method)
 
-julia> @code_native simd_sum(A)
+julia> @code_native debuginfo=:none simd_sum(A)
 ...
+.LBB0_5:                                # %vector.ph
+	movabs	rdx, 9223372036854775792
+	and	rdx, rax
+	movabs	rsi, offset .LCPI0_0
+	vbroadcastsd	ymm0, qword ptr [rsi]
+	movabs	rsi, offset .LCPI0_1
+	vmovapd	ymm1, ymmword ptr [rsi]
+	xor	esi, esi
+	vmovapd	ymm2, ymm0
+	vmovapd	ymm3, ymm0
+	.p2align	4, 0x90
 .LBB0_6:                                # %vector.body
                                         # =>This Inner Loop Header: Depth=1
-; ││ @ simdloop.jl:77 within `macro expansion` @ REPL[1]:4
-; ││┌ @ float.jl:495 within `+`
 	vaddpd	ymm1, ymm1, ymmword ptr [rcx + 8*rsi]
 	vaddpd	ymm0, ymm0, ymmword ptr [rcx + 8*rsi + 32]
 	vaddpd	ymm2, ymm2, ymmword ptr [rcx + 8*rsi + 64]
 	vaddpd	ymm3, ymm3, ymmword ptr [rcx + 8*rsi + 96]
-; ││└
-; ││ @ simdloop.jl:78 within `macro expansion`
-; ││┌ @ int.jl:87 within `+`
 	add	rsi, 16
 	cmp	rdx, rsi
 	jne	.LBB0_6
 # %bb.7:                                # %middle.block
-; ││└
-; ││ @ simdloop.jl:75 within `macro expansion`
 	vaddpd	ymm0, ymm0, ymm1
 	vaddpd	ymm0, ymm2, ymm0
 	vaddpd	ymm0, ymm3, ymm0
@@ -151,47 +156,157 @@ julia> @code_native simd_sum(A)
 	.p2align	4, 0x90
 ...
 ```
-Without `@simd`:
+Ok. Better. But that's still not the optimum.
+
+There is a module, [`LoopVectorization`](https://github.com/JuliaSIMD/LoopVectorization.jl). Let's try that one.
 ```julia
-julia> function only_sum(A)
+julia> A = rand(1000);
+
+julia> using LoopVectorization
+
+julia> function avx512_sum(A)
            s = 0.0
-           for i in eachindex(A)
-               s += A[i]
+           @turbo for i in eachindex(A)
+               @inbounds s += A[i]
            end
            s
        end
-only_sum (generic function with 1 method)
+avx512_sum (generic function with 1 method)
 
-julia> @code_native only_sum(A)
+julia> @code_native debuginfo=:none avx512_sum(A)
 ...
-.LBB0_6:                                # %L30
+.LBB0_5:                                # %L42
                                         # =>This Inner Loop Header: Depth=1
-; │└
-; │┌ @ float.jl:495 within `+`
-	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx]
-	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 8]
-	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 16]
-	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 24]
-	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 32]
-	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 40]
-	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 48]
-	vaddsd	xmm0, xmm0, qword ptr [rcx + 8*rdx + 56]
-; │└
-; │ @ REPL[5]:5 within `only_sum`
-	add	rdx, 8
-	cmp	rsi, rdx
-	jne	.LBB0_6
-# %bb.7:                                # %L46.loopexit.unr-lcssa.loopexit
-	inc	rdx
-	test	rax, rax
-	je	.LBB0_11
+	vaddpd	zmm6, zmm6, zmmword ptr [rax + 8*rcx]
+	vaddpd	zmm7, zmm7, zmmword ptr [rax + 8*rcx + 64]
+	vaddpd	zmm5, zmm5, zmmword ptr [rax + 8*rcx + 128]
+	vaddpd	zmm4, zmm4, zmmword ptr [rax + 8*rcx + 192]
+	vaddpd	zmm2, zmm2, zmmword ptr [rax + 8*rcx + 256]
+	vaddpd	zmm3, zmm3, zmmword ptr [rax + 8*rcx + 320]
+	vaddpd	zmm1, zmm1, zmmword ptr [rax + 8*rcx + 384]
+	vaddpd	zmm0, zmm0, zmmword ptr [rax + 8*rcx + 448]
+	vaddpd	zmm6, zmm6, zmmword ptr [rax + 8*rcx + 512]
+	vaddpd	zmm7, zmm7, zmmword ptr [rax + 8*rcx + 576]
+	vaddpd	zmm5, zmm5, zmmword ptr [rax + 8*rcx + 640]
+	vaddpd	zmm4, zmm4, zmmword ptr [rax + 8*rcx + 704]
+	vaddpd	zmm2, zmm2, zmmword ptr [rax + 8*rcx + 768]
+	vaddpd	zmm3, zmm3, zmmword ptr [rax + 8*rcx + 832]
+	vaddpd	zmm1, zmm1, zmmword ptr [rax + 8*rcx + 896]
+	vaddpd	zmm0, zmm0, zmmword ptr [rax + 8*rcx + 960]
+	sub	rcx, -128
+	add	rdi, -2
+	jne	.LBB0_5
+.LBB0_6:                                # %L64.unr-lcssa
+	test	sil, 64
+	jne	.LBB0_8
+# %bb.7:                                # %L42.epil.preheader
+	vaddpd	zmm6, zmm6, zmmword ptr [rax + 8*rcx]
+	vaddpd	zmm7, zmm7, zmmword ptr [rax + 8*rcx + 64]
+	vaddpd	zmm5, zmm5, zmmword ptr [rax + 8*rcx + 128]
+	vaddpd	zmm4, zmm4, zmmword ptr [rax + 8*rcx + 192]
+	vaddpd	zmm2, zmm2, zmmword ptr [rax + 8*rcx + 256]
+	vaddpd	zmm3, zmm3, zmmword ptr [rax + 8*rcx + 320]
+	vaddpd	zmm1, zmm1, zmmword ptr [rax + 8*rcx + 384]
+	vaddpd	zmm0, zmm0, zmmword ptr [rax + 8*rcx + 448]
+.LBB0_8:                                # %L64
+	vaddpd	zmm0, zmm4, zmm0
+	vaddpd	zmm4, zmm5, zmm1
+	vaddpd	zmm1, zmm7, zmm3
+	vaddpd	zmm1, zmm1, zmm0
+	vaddpd	zmm0, zmm6, zmm2
+	vaddpd	zmm0, zmm0, zmm4
 ...
 ```
-So, sometimes it helps. (Note: This here was a reduction. Adding two array is quite a different thing.)
-`@inbounds` deactivates the bound checking. It's for performance.
+Nice!! zmm registers.
 
-Using compact dot-notation very often helps, if applicable.
+Let's measure whether this also helped somehow.
+```julia
+julia> using BenchmarkTools
 
+julia> @btime only_sum($A);
+  1.640 μs (0 allocations: 0 bytes)
+
+julia> @btime simd_sum($A);
+  109.011 ns (0 allocations: 0 bytes)
+
+julia> @btime avx512_sum($A);
+  55.786 ns (0 allocations: 0 bytes)
+```
+That's interesting, isn't it? So, using AVX512 enhances a lot!! 
+
+But wait! Do these functions all the same thing, too? (Correctness first!!)
+```julia
+julia> only_sum(A)
+501.71105330489524
+
+julia> simd_sum(A)
+501.71105330489536
+
+julia> avx512_sum(A)
+501.71105330489536
+```
+Ok. Good enough!
+
+**Inline Task:** Let's return to the former addition of two arrays. As we don't get ahead with `A .+ B`, let's write that as a normal function, where the result is returned in-place (`C` must already exist).
+```julia
+julia> function add_for!(C, A, B)
+           @inbounds for i in eachindex(A, B, C)
+               C[i] = A[i] + B[i]
+           end
+       end
+add_for! (generic function with 1 method)
+```
+What does `@code_native` show? ... (`@. C = A + B` ... ?)
+Does `@simd` help? Does `@turbo` help?
+Also benchmark! What do you find?
+
+<details>
+	<summary>Conclusion</summary>
+
+The other function definitions are:
+```julia
+function add_simd!(C, A, B)
+	@inbounds @simd for i in eachindex(A, B, C)
+		C[i] = A[i] + B[i]
+	end
+end
+
+function add_avx512!(C, A, B)
+	@inbounds @turbo for i in eachindex(A, B, C)
+		C[i] = A[i] + B[i]
+	end
+end
+```
+`add_for!` and `for_simd!` show ymm register. `add_avx512!` contains zmm registers. So far, ok. Let's benchmark - and check correctness.
+```julia
+julia> @btime add_for!($C,$A,$B);
+  123.556 ns (0 allocations: 0 bytes)
+
+julia> @btime add_simd!($C,$A,$B);
+  125.613 ns (0 allocations: 0 bytes)
+
+julia> @btime add_avx512!($C,$A,$B);
+  154.747 ns (0 allocations: 0 bytes)
+
+julia> add_for!(C,A,B)
+
+julia> D = similar(A);
+
+julia> add_simd!(D,A,B)
+
+julia> E = similar(A);
+
+julia> add_avx512!(E,A,B)
+
+julia> C == D
+true
+
+julia> C == E
+true
+```
+At least, all functions return the same result. But vectorization doesn't seem to be beneficial. Honestly, it shouldn't. The array addition is known to be memory bound. The CPUs idle waiting for the data from the memory. 
+But it doesn't matter if one doesn't know these details. We can simply try and measure. And take what's the best!
+</details>
 
 ### Threads
 [`Threads`](https://docs.julialang.org/en/v1/manual/multi-threading/) are already included into the `Base` package in Julia.
