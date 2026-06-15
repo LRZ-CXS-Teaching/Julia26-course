@@ -378,7 +378,7 @@ C = similar(A);
 
 using BenchmarkTools
 
-@btime matmul_serial!($C, $A, $B)
+@btime matmul_serial!matmul_serial!($C, $A, $B)
 
 @btime matmul_tturbo!($C, $A, $B)
 ```
@@ -389,14 +389,18 @@ What do you observe?
 <details>
 	<summary>Conclusion</summary>
 
+`matmul_serial!` is way slower than `matmul_tturbo!`, as expected. Also already for a single thread. (Factor 7 about.)
+
 Also try
 ```julia
 using LinearAlgebra
 
 @btime C .= A * B
 ```
+It's a bit faster than the single-thread `matmul_tturbo!`.
 
-Maybe better use `LinearAlgebra` for that ... `C .= A * B`. ;) (Yes. That's also threaded, if you want, and really optimized ... see below.)
+Maybe better use `LinearAlgebra` ... `C .= A * B`. ;) 
+And yes. It's also threaded, if you want, and usually well optimized ... 
 
 Btw. here a small script how scaling tests could be done. There is unfortunately no way to set the number of threads from inside a julia script.
 ```julia
