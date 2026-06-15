@@ -832,7 +832,7 @@ If you have a lot of independent tasks - e.g. you want to run some program indep
 using Distributed
 
 # setup OpenMP if julia was started with -t option, and the program is OpenMP parallel
-try ENV["OMP_NUM_THREADS"] = nthreads() catch end
+try ENV["OMP_NUM_THREADS"] = Threads.nthreads() catch end
 
 # create workers
 nworkers() == 1 && addprocs(4)
