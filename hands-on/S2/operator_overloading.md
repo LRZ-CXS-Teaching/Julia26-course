@@ -38,7 +38,7 @@ a \times b = \begin{pmatrix}
       a_xb_y - a_yb_x
 \end{pmatrix}
 ```
-**Hint:**  `LinearAlgebra` also contains also already a `cross` function. Just do as for `dot`!
+**Hint:**  `LinearAlgebra` contains already a `cross` function. Just do as for `dot`!
 
 <details>
     <summary>Solution</summary>
