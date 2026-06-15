@@ -101,7 +101,7 @@ The idea is simple. One has some data, $[x_i, y_i, \sigma_i]$ ($i=1,\ldots,N$), 
 ```math
 \chi^2(a) = \sum_{i=1}^N\left(\frac{y_i-f(x_i;a)}{\sigma_i}\right)^2 \rightarrow \text{min!} (\text{wrt. }a)\;.
 ```
-In Julia, one can use e.g. the module [LsqFit](https://github.com/JuliaNLSolvers/LsqFit.jl) to accomplish this minimization (there are really quite more). The "model" is just a normal function, `f(x,a)`, in julia with `a` being possibly an array. E.g. `f(x,a) = a[1] + x*a[2]`.
+In Julia, one can use e.g. the module [LsqFit](https://github.com/JuliaNLSolvers/LsqFit.jl) to accomplish this minimization (there are really quite more). The "model" is just a normal function, `f(x,a)`, in julia with `a` being possibly an array. E.g. `model(x,a) = @. a[1] + x*a[2]`.
 
 The `curve_fit` function from `LsqFit` takes this model, and the data, and does the minimzation starting from some defined initial state of the parameters (please check the examples on their docu page). 
 
@@ -118,6 +118,7 @@ plot(df.x,df.y,yerror=df.yerr, st = :scatter, markershape = :square, markercolor
 In a next step, define a model with some parameters, and let `LsqFit` do the minimization for you.
 ```julia
 a0 = [0.,0.]      # so many parameters you have
+weights = 1.0 ./ (df.yerr .^ 2)
 fit = curve_fit(model, df.x, df.y, weights, a0)
 ```
 **Remark** `curve_fit` will require some weights based on the $\sigma_i$ (uncertainties). These are actually `weights[i]`$=1/\sigma_i^2$.
