@@ -105,6 +105,8 @@ a = nothing; GC.gc(); CUDA.reclaim(); CUDA.pool_status()
 a = CUDA.zeros(Int64,1+ 4*1024*1024); CUDA.pool_status()
     # Effective GPU memory usage: 2.32% (373.938 MiB/15.766 GiB)
     # Memory pool usage: 32.000 MiB (64.000 MiB reserved)       # now is 64!
+# This is intentional: cudaMalloc/cudaFree are expensive (driver-level synchronization)
+# => The pool trades memory for allocation latency.
 
 # NOTE: cuarrays are managed by Julia garbage collector
 # => they will be collected once they are unreachable, and their memory will be freed
@@ -116,6 +118,14 @@ a = CuArray([1])        # 1-element CuArray{Int64,1,Nothing}:
 CUDA.unsafe_free!(a)
 a                       # ERROR: ArgumentError: Attempt to use a freed reference
 ```
+
+Question: difference between `CUDA.reclaim()` and `CUDA.unsafe_free!(x)`?
+1. `CUDA.reclaim()` tells the memory pool to release **cached but idle** GPU memory back to the driver
+  - => safe: only touches memory the GC already collected
+  - => general: applies to ALL the GPU memory
+2. `CUDA.unsafe_free!(x)` immediately deallocates the input GPU buffer, bypassing the GC entirely
+  - => unsafe: any surviving reference to input `x` becomes a dangling pointer
+  - => local: applies only to input `x` 
 
 <br>
 <br>
@@ -544,38 +554,57 @@ const DevArray = CUDA.CuArray
 const DevFloat = Float32
 
 @kernel function block_sum_kernel!(out, @Const(x))
+    # Memory and sizes info
+    #
+    # @localmem: declare storage that is local to a WorkGroup
+    # => allocates shared/local memory (fast, on-chip, per-group)
+    #    size must be known at compile time -> tied to groupsize chosen at launch
+    #    e.g.:
+    #       shmem = @localmem Float32 (1024,)          # allocate 1024-long Float32 memory for each WorkGroup
+    #       n = 256; shmem = @localmem DevFloat (n,)   # ERROR: n is a runtime value, and GPU compilers must know shared memory size statically 
+    #
+    # @private : declare storage that is local to each thread in the WorkGroup
+    #       privmem = @private Float32 (1024,)          # allocate 1024-long Float32 memory for each thread
+    #
+    # @groupsize() : returns a tuple corresponding to the kernel configured WorkGroup sizes
+    # => in order to get the total size you can use "prod(@groupsize())"
+    #
+    # @ndrange() : returns a tuple corresponding to kernel configured ndrange on the backend
 
-    gi = @index(Global)  # global thread index across all groups (≈ CUDA flat index)
-    li = @index(Local)   # thread index within this group (1-based, ≈ threadIdx)
-    bi = @index(Group)   # group index (≈ blockIdx)
+    # ---------- 0. Allocated the indexes ----------
+    #     the following are ALL 1-based INDEXES!
+    gi = @index(Global)   # ∈ [1, N]       = (blockIdx-1)*blockDim + threadIdx = global thread index across all groups (= CUDA flat index)
+    bi = @index(Group)    # ∈ [1, ngroups] = blockIdx                          = Thread Block (WorkGroup) index
+    li = @index(Local)    # ∈ [1, 256]     = threadIdx                         = thread index within this Thread Block
 
-    # @localmem: allocates shared/local memory (fast, on-chip, per-group)
-    # size must be known at compile time -> tied to groupsize chosen at launch
-    shmem = @localmem DevFloat (@groupsize()[1],)
+    # ---------- 1. Allocate the WorkGroup memory ----------
+    shmem = @localmem DevFloat (@groupsize()[1],)   # each WG gets a Float32 mem long as the number of threads in each WG => each thread has 1 Float32 mem
+    # NOTE: @groupsize() is not a runtime function call!
+    # At LLVM/PTX level, @groupsize()[1] is the literal 256, not a variable
 
-    # PHASE 1: each thread loads one element from slow global memory into fast shmem
+    # ---------- 2. Local load ----------
+    # each thread loads one element from slow global memory into fast shmem
     # out-of-bounds threads load 0 (neutral element for +) to avoid if-branching later
     shmem[li] = gi <= length(x) ? x[gi] : 0f0
-
     @synchronize()  # barrier: no thread proceeds until ALL threads finished loading
 
-    # PHASE 2: parallel tree reduction within the group
+    # ---------- 3. Parallel tree reduction within the group ----------
     # each step halves the active threads; stride walks down powers of 2
-    # e.g. groupsize=8: steps are 4,2,1
+    # e.g.: with groupsize=8, steps are 4,2,1
     #   step 4: threads 1..4 add shmem[1..4] += shmem[5..8]
     #   step 2: threads 1..2 add shmem[1..2] += shmem[3..4]
     #   step 1: thread  1    adds shmem[1]   += shmem[2]
-    stride = @groupsize()[1] >> 1   # >> 1 == ÷ 2, but avoids integer division
+    stride = @groupsize()[1] >> 1   # >> 1 == ÷ 2, but avoids integer division => 256 >> 1 = 128
     while stride > 0
-        if li <= stride
+        if li <= stride     # selects which subset of threads is active each iteration
             shmem[li] += shmem[li + stride]
         end
-        @synchronize()   # wait after each step — threads in later steps
-                         # read values written by threads in this step
-        stride >>= 1
+        @synchronize()      # wait after each step; threads in later steps read values written by threads in this step
+        stride >>= 1        # bitwise right-shift assignment: stride = stride >> 1 => 128 → 64 → 32 → ... → 1 → 0
     end
 
-    # PHASE 3: thread 1 of each group writes the group's partial sum to global memory
+    # ---------- 4. Write result ----------
+    # thread 1 of each group writes the group's partial sum to global memory
     if li == 1
         out[bi] = shmem[1]   # one output element per group
     end
@@ -583,7 +612,7 @@ end
 
 N = 2^20
 x = DevLibrary.rand(Float32, N)
-groupsize = 256                 # threads per group — must be power of 2
+groupsize = 256                 # threads per group, must be power of 2
 ngroups = cld(N, groupsize)     # ceiling division: number of groups
 
 out = DevArray{Float32}(undef, ngroups)      # partial sums buffer: one element per group
