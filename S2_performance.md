@@ -138,7 +138,7 @@ In many cases, with this little information extra, compilers really can do some 
 ### Beware of Temporaries
 Let's look at the following innocously looking code.
 ```julia
-function naiv_addieren(B, C, iterationen)
+function naiv_add(B, C, iterationen)
     A = zeros(size(B))
     for _ in 1:iterationen
         A = B + C                   # allocates each time anew
