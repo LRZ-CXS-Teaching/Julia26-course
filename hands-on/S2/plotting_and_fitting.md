@@ -112,7 +112,7 @@ using Plots, DataFrames, Random
 rng = Xoshiro(23423)
 f(x) = 5x^3 - 4x^2 + 2.2x - 5.5
 df = DataFrame([0:1.0:10],[:x])
-transform!(df, :x => ByRow(x -> (y = f(x); yerr = y*0.1*randn(); return [y + yerr, abs(0.1*y)])) => [:y, :yerr])
+transform!(df, :x => ByRow(x -> (y = f(x); yerr = y*0.1*randn(rng); return [y + yerr, abs(0.1*y)])) => [:y, :yerr])
 plot(df.x,df.y,yerror=df.yerr, st = :scatter, markershape = :square, markercolor = :red, markeralpha = 0.8, label="measurement data")
 ```
 In a next step, define a model with some parameters, and let `LsqFit` do the minimization for you.
