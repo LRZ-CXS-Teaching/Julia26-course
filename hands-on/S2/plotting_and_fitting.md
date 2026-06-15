@@ -35,7 +35,7 @@ plot(x,y,yerror=yerr, st=:scatter)              # scatter plot with error bars
   <summary>plot result</summary>
 
 <div align="center">
-  <img src="error-plot.png" width="600" alt="error graph plot">
+  <img src="../../miscellanea/images/error-plot.png" width="600" alt="error graph plot">
 </div>
 </details>
 
@@ -66,7 +66,7 @@ heatmap(-2:0.001:1,-1:0.001:1,(x,y)->(c=x+y*im; z=0+0im; for i in 1:100 z = z^2 
   <summary>plot result</summary>
 
 <div align="center">
-  <img src="mandelbrot.png" width="800" alt="Mandelbrot set">
+  <img src="../../miscellanea/images/mandelbrot.png" width="800" alt="Mandelbrot set">
 </div>
 </details>
 
@@ -86,7 +86,7 @@ Create a plot of a Julia set. Zoom into details. Admire.
 heatmap(-1.6:0.001:1.6,-1:0.001:1,(x,y)->(c=-0.8+0.156im; z=complex(x,y); for i in 1:100 z = z^2 + c; abs(z) > 2 && return i/100; end; 0), c=:haline, size=(1400,900))
 ```
 <div align="center">
-  <img src="juliaset.png" width="800" alt="Julia set">
+  <img src="../../miscellanea/images/juliaset.png" width="800" alt="Julia set">
 </div>
 </details>
 
@@ -244,6 +244,6 @@ savefig("bayes_result.pdf")
   <summary>Bayes inference fit result</summary>
 
 <div align="center">
-  <img src="bayes_result.png" width="600" alt="fit result plot">
+  <img src="../../miscellanea/images/bayes_result.png" width="600" alt="fit result plot">
 </div>
 </details>
