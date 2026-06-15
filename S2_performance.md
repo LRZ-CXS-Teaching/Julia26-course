@@ -426,7 +426,7 @@ This can also be exploited to avoid ugly (and often inefficient) `if` conditions
 
 
 ### Inlining
-Function call have slight overhead (despite the statement about "first citizens" in julia). You can try to avoid by inlining functions in julia, where it makes sense, using the `@inline` macro. For instance,
+Function calls have a slight overhead (despite the statement about "first citizens" in julia). You can try to avoid by inlining functions in julia, where it makes sense, using the `@inline` macro. For instance,
 ```julia
 julia> @inline g(x) = x^2
 ```
