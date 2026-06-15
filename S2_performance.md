@@ -148,7 +148,7 @@ end
 ```
 Let's compare that with
 ```julia
-function inplace_addieren(B, C, iterationen)
+function inplace_add(B, C, iterationen)
     A = zeros(size(B))
     for _ in 1:iterationen
         A .= B .+ C                 # 0 allocations, overwrite in-place
@@ -160,10 +160,10 @@ Let's measure that using `BenchmarkTools`.
 ```julia
 julia> B = rand(2000, 2000); C = rand(2000, 2000);
 
-julia> @btime naiv_addieren($B, $C, 100);
+julia> @btime naiv_add($B, $C, 100);
   870.332 ms (303 allocations: 3.01 GiB)
 
-julia> @btime inplace_addieren($B, $C, 100);
+julia> @btime inplace_add($B, $C, 100);
   655.145 ms (3 allocations: 30.52 MiB)
 ```
 You may ask, what's the matter. Well, at some time, the Julia garbage collector is triggered. And this may *really* take some time to clean out all the temporaries.
