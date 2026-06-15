@@ -469,7 +469,7 @@ p2 = plot(thread_bereich, speedup,
           xlabel = "# threads", 
           ylabel = "speed-up", 
           title = "scaling (speed-up)", 
-          label = "measures speed-up", 
+          label = "measured speed-up", 
           lw = 2,
           legend = :topleft)
 
