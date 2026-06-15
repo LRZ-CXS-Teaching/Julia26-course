@@ -77,7 +77,7 @@ plot(p1, p2, layout=(1, 2), size=(900, 400), bottom_margin = 4mm, left_margin = 
 </details>
 
 <div align="center">
-  <img src="lotka-volterra.png" width="800" alt="Lotka-Volterra Model">
+  <img src="../../miscellanea/images/lotka-volterra.png" width="800" alt="Lotka-Volterra Model">
 </div>
 
 ## PDE Example (showcase)
@@ -240,7 +240,7 @@ Furthermore, the solution time is merely on the order of 2-3 minutes. There is t
 Here is how the results might look like (RNG individualizes maybe).
 
 <div align="center">
-  <img src="shg.png" width="800" alt="Swift-Hohenberg">
+  <img src="../../miscellanea/images/shg.png" width="800" alt="Swift-Hohenberg">
 </div>
 
 **Final Remark:** There is also something like a "progress meter" for the ODE solver. Just google for it, if interested.
