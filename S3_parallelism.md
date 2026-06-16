@@ -389,7 +389,7 @@ What do you observe?
 <details>
 	<summary>Conclusion</summary>
 
-`matmul_serial!` is way slower than `matmul_tturbo!`, as expected. Also already for a single thread. (Factor 7 about.)
+`matmul_serial!` is way slower than `matmul_tturbo!`, as expected. Also already for a single thread. Factor 7 about. Loop-unrolling and auto-vectorization is included in `@tturbo`.
 
 Also try
 ```julia
