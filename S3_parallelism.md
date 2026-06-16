@@ -378,7 +378,7 @@ C = similar(A);
 
 using BenchmarkTools
 
-@btime matmul_serial!matmul_serial!($C, $A, $B)
+@btime matmul_serial!($C, $A, $B)
 
 @btime matmul_tturbo!($C, $A, $B)
 ```
