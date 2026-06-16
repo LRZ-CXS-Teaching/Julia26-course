@@ -186,18 +186,15 @@ data = [Particle3D(rand(), rand(), rand()) for _ in 1:N]
 ```
 In a MD simulation, one maybe needs to calculate the compute the respective distances. For simplicity of illustration, let's "only" determine the center-of-gravity (CoG) of the particle cloud.
 ```julia
-function compute_center_of_gravity(particles)
-    x², y², z² = [0., 0, 0]
-    for i in eachindex(particles)
-        @inbounds p = particles[i]     # no boundary checks
-        x² += p.x^2
-        y² += p.y^2
-        z² += p.z^2
-    end
-    x = √(x²/length(particles))
-    y = √(y²/length(particles))
-    z = √(z²/length(particles))
-    return [x,y,z]
+julia> function compute_center_of_gravity(particles)
+  x, y, z = [0., 0, 0]
+  for i in eachindex(particles)
+    @inbounds p = particles[i]     # no boundary checks
+    x += p.x
+    y += p.y
+    z += p.z
+  end
+  return [x,y,z]/length(particles)
 end
 
 a = compute_center_of_gravity(data)
@@ -207,7 +204,7 @@ Well, there is really nothing wrong. But only a bit inefficient for computers. I
 Benchmarking of this gives (Intel Icelake).
 ```
 --- Performance AoS (Standard Array) ---
-  24.584 ms (2 allocations: 80 bytes)
+  19.109 ms (4 allocations: 160 bytes)
 ```
 
 Here, in short: Computers are better in accessing contiguous pieces of memory. And `data` has data in memory according to the pattern `data = [x1, y1, z1, x2, y2, z2, ...]`, which is a less optimal for this loop computation.
@@ -227,17 +224,16 @@ z_coords = rand(Float64, N)
 soa_particles = ParticlePositions(x_coords, y_coords, z_coords)
 
 function compute_center_of_gravity_soa(particles)
-    return [√sum(particles.x.^2), √sum(particles.y.^2), √sum(particles.z.^2)] ./ length(particles.x)
+  return [sum(particles.x), sum(particles.y), sum(particles.z)] ./ length(particles.x)
 end
 ```
 First of all, we need another extra function to calculate the CoG. Second, it is way slower!! The benchmarking results in
 ```
 --- Performance SoA (StructArray) ---
-  78.799 ms (13 allocations: 228.89 MiB)
+  16.264 ms (4 allocations: 160 bytes)
 ```
-where immediately is clear what the issue is ... memory allocation for temporary arrays.
-
-Ok. The function looks way shorter. Very compact. But what does it help?!
+Ok. It's indeed faster. The function looks way shorter. Very compact. 
+But we needed an extra function, and could not reuse our former function. And SoA is harder to comprehend, as we index now the coordinates ... not the particles.
 
 <br>
 
@@ -257,35 +253,32 @@ const N = 10_000_000
 aos_data = [Particle3D(rand(), rand(), rand()) for _ in 1:N]
 soa_data = StructArray(aos_data)                                     # makes a deep copy of aos_data!
 
-function compute_center_of_gravity!(particles)                       # same function for AoS and SoA
-    x², y², z² = (0, 0, 0)
+function compute_center_of_gravity(particles)                       # same function for AoS and SoA
+    x, y, z = (0, 0, 0)
     for i in eachindex(particles)
         @inbounds p = particles[i]                                   # no boundary checks
-        x² += p.x^2
-        y² += p.y^2
-        z² += p.z^2
+        x += p.x
+        y += p.y
+        z += p.z
     end
-    x = √(x²/length(particles))
-    y = √(y²/length(particles))
-    z = √(z²/length(particles))
-    return [x,y,z]
+    return [x,y,z]/length(particles)
 end
 
 println("--- Performance AoS (Standard Array) ---")
-@btime compute_center_of_gravity!($aos_data);
+@btime compute_center_of_gravity($aos_data);
 
 println("\n--- Performance SoA (StructArray) ---")
-@btime compute_center_of_gravity!($soa_data);
+@btime compute_center_of_gravity($soa_data);
 ```
 The result is
 ```
 --- Performance AoS (Standard Array) ---
-  24.938 ms (2 allocations: 80 bytes)
+  19.922 ms (4 allocations: 160 bytes)
 
 --- Performance SoA (StructArray) ---
-  19.511 ms (2 allocations: 80 bytes)
+  16.855 ms (4 allocations: 160 bytes)
 ```
-A speed-up of 1.28 (speed-up = reference-execution-time / other-execution-time ; see next section).
+A speed-up of 1.28 (speed-up = reference-execution-time / other-execution-time ; see next section). Consistently with our own SoS implementation. But way less efforts. We could even reuse the same function for SoA as for AoS!
 
 There is still a tradeoff. `soa_data = StructArray(aos_data)` copies the AoS data into a new data structure. This means memory allocation! If one can dispense with the AoS data, and work only with the SoA data then, one can execute `aos_data = nothing; GC.gc()` in order to let the garbage collector remove the AoS data from memory. Also this requires some time!
 
