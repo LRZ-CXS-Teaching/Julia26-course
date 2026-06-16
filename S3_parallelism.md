@@ -81,12 +81,12 @@ The compiler vectorizes only to ymm-registers (AVX2) instead of zmm-registers (A
 Let's look at something simpler. Let's write a function that sums up all array elements.
 ```julia
  function only_sum(A)
-           s = 0.0
-           for i in eachindex(A)
-               s += A[i]
-           end
-           s
-       end
+	s = 0.0
+	for i in eachindex(A)
+		s += A[i]
+	end
+	s
+end
 ```
 Checking the assembly output, we obtain:
 ```julia
