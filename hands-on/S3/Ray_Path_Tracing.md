@@ -496,7 +496,7 @@ With 80 threads, it took about half an hour (35 minutes) on a 80 cores of a Inte
 </div>
 </details>
 
-Next to that, there appears to be flaw in this program. It is way slower than actually necessary. In the solution section, you can see an alternative, fully parallelized using master/worker, and avoind `Images` ... and is *really* faster! (On 112 CPUs, with the 1290x900 settings, just a minute!!)
+Next to that, there appears to be flaw in this program. It is way slower than actually necessary. In the solution section, you can see an alternative, fully parallelized using master/worker, and avoid `Images` ... and is *really* faster! (On 112 CPUs, with the 1290x900 settings, just a minute!!)
 
 ## Remark
 The `Images` module is huge wrt. to its dependencies. Precompilation requires possibly quite some time. Ahead-of-time compilation is advisable. But also file system access can become a bottleneck. Loading one or few instances of a library, is usually not an issue. But if libraries are large, and really many processes at a time try to access it ... Boom! 
